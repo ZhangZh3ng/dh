@@ -1,13 +1,14 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-05 20:34:22
- * @LastEditTime: 2021-08-06 20:51:25
+ * @LastEditTime: 2021-08-07 09:39:16
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/main.cpp
  */
 
 #include "core.hpp"
+#include "unit.hpp"
 #include <iostream>
 #include <Eigen/Core>
 #include <Eigen/Eigen>
@@ -23,7 +24,10 @@ void test(){
     mat = dh::core::askew(r);
     std::cout << mat(1,2) << std::endl;
     std::cout << dh::core::quat_add_rot(q, r) << std::endl;
-    std::cout << dh::core::vee(mat) << std::endl;
+    std::cout << dh::core::vee(mat) << std::endl;   
+    std::cout << dh::unit::DEGREE << std::endl;
+    std::cout << dh::unit::ug << std::endl;
+
 }
 
 int main(int argc, char** argv){
