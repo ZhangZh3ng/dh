@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-05 20:01:04
- * @LastEditTime: 2021-08-08 11:07:01
+ * @LastEditTime: 2021-08-09 20:06:08
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/include/core.hpp
@@ -13,6 +13,7 @@
 #include <string>
 #include <iostream>
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 #include <math.h>
 
 namespace dh

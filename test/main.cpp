@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-05 20:34:22
- * @LastEditTime: 2021-08-08 10:46:27
+ * @LastEditTime: 2021-08-09 19:33:26
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/main.cpp
@@ -90,8 +90,13 @@ void test_quat_add_rot(){
 
 }
 
+void test_gravity_in_ENU(){
+    double lat = 45*dh::unit::DEGREE;
+    double alt = 100;
+    std::cout << dh::sins::gravity_in_ENU(lat, alt) << std::endl;
+}
 int main(int argc, char **argv)
 {
-    test_quat_add_rot();
+    test_gravity_in_ENU();
     return 0;
 }
