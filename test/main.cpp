@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-05 20:34:22
- * @LastEditTime: 2021-08-13 17:05:45
+ * @LastEditTime: 2021-08-13 20:57:21
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/main.cpp
@@ -111,8 +111,38 @@ void test_sins_Mpv(){
     std::cout << dh::sins::sins_Mpv(lat, alt) << std::endl;
 }
 
+void test_cross_product(){
+    Eigen::Matrix<double, 3, 1> v1;
+    Eigen::Matrix<double, 3, 1> v2;
+    v1 << 1, 2, 3;
+    v2 << 4, 7, 9;
+    std::cout << dh::core::cross_product(v1, v2) << std::endl;
+}
+
+void test_angle_increment_to_quaternion(){
+    Eigen::Matrix<double, 3, 1> a;
+    a << 1*dh::unit::DEGREE, 0.5*dh::unit::DEGREE, 0.8*dh::unit::DEGREE;
+    std::cout << dh::core::angle_increment_2_quat(a).coeffs() << std::endl;
+}
+
+void test_rotation_matrix_to_euler_angle(){
+
+}
+
+void test_euler_angle_2_dcm(){
+    double r1 = 30*dh::unit::DEGREE;
+    double r2 = 3*dh::unit::DEGREE;
+    double r3 = 1*dh::unit::DEGREE;
+
+    Eigen::Matrix<double, 3, 3> mat;
+    mat = dh::core::euler_angle_2_dcm(r1, r2, r3, dh::core::RotationAxis::Z, dh::core::RotationAxis::X, dh::core::RotationAxis::Y);
+
+    std::cout<< mat << std::endl;
+}
+
+
 int main(int argc, char **argv)
 {
-    test_sins_Mpv();
+    test_euler_angle_2_dcm();
     return 0;
 }

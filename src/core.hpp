@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-05 20:01:04
- * @LastEditTime: 2021-08-13 16:52:14
+ * @LastEditTime: 2021-08-13 20:59:04
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/include/core.hpp
@@ -15,6 +15,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <math.h>
+#include "unit.hpp"
 
 namespace dh
 {
@@ -160,9 +161,10 @@ namespace dh
          * @param alpha Angle increment in radian.
          * @return Eigen::AngleAxis<double>& 
          */
-        inline Eigen::AngleAxis<double> angle_increment_2_angle_axis(const Eigen::Matrix<double, 3, 1> &alpha){
+        inline Eigen::AngleAxis<double> angle_increment_2_angle_axis(const Eigen::Matrix<double, 3, 1> &alpha)
+        {
             const double mag_alpha = alpha.norm();
-            Eigen::Matrix<double, 3, 1> v_alpha = alpha/mag_alpha;
+            Eigen::Matrix<double, 3, 1> v_alpha = alpha / mag_alpha;
             Eigen::AngleAxis<double> rotation_vector(mag_alpha, v_alpha);
             return rotation_vector;
         }
@@ -173,7 +175,8 @@ namespace dh
          * @param alpha Angle increment in raian.
          * @return Eigen::Quaternion<double>& 
          */
-        inline Eigen::Quaternion<double> angle_increment_2_quat(const Eigen::Matrix<double, 3, 1> &alpha){
+        inline Eigen::Quaternion<double> angle_increment_2_quat(const Eigen::Matrix<double, 3, 1> &alpha)
+        {
             Eigen::AngleAxis<double> rotation_vector = dh::core::angle_increment_2_angle_axis(alpha);
             Eigen::Quaternion<double> q(rotation_vector);
             return q;
@@ -186,14 +189,84 @@ namespace dh
          * @param r Vector in the rigth.
          * @return Eigen::Matrix<double, 3, 1> 
          */
-        inline Eigen::Matrix<double, 3, 1> cross_product(const Eigen::Matrix<double, 3, 1> v, const Eigen::Matrix<double, 3, 1> r){
+        inline Eigen::Matrix<double, 3, 1> cross_product(const Eigen::Matrix<double, 3, 1> v, const Eigen::Matrix<double, 3, 1> r)
+        {
             Eigen::Matrix<double, 3, 1> vo;
-            vo(0) = v(1)*r(2) - v(2)*r(1);
-            vo(1) = v(2)*r(0) - v(0)*r(2);
-            vo(2) = v(0)*r(1) - v(1)*r(0);
+            vo(0) = v(1) * r(2) - v(2) * r(1);
+            vo(1) = v(2) * r(0) - v(0) * r(2);
+            vo(2) = v(0) * r(1) - v(1) * r(0);
             return vo;
         }
 
+        enum RotationAxis
+        {
+            X,
+            Y,
+            Z
+        };
+
+        /**
+         * @brief Convert three single euler angle to rotation matrix.
+         * 
+         * @param r1 Angle of the first rotation, in radian
+         * @param r2 Angle of the secound rotation.
+         * @param r3 Angle of the last rotation.
+         * @param axis1 Axis of the first rotation ratate around.
+         * @param axis2 Axis of the second rotation ratate around.
+         * @param axis3 Axis of the last rotation ratate around.
+         * @return Eigen::Matrix<double, 3, 3> 
+         */
+        inline Eigen::Matrix<double, 3, 3> euler_angle_2_dcm(const double r1, const double r2, const double r3, dh::core::RotationAxis axis1, dh::core::RotationAxis axis2, dh::core::RotationAxis axis3)
+        {
+            if (axis1 == axis2 || axis2 == axis3)
+            {
+                throw 1;
+            }
+
+            Eigen::Matrix<double, 3, 3> m1, m2, m3, mat;
+
+            switch (axis1)
+            {
+            case dh::core::RotationAxis::X:
+                m1 = Eigen::AngleAxisd(r1, Eigen::Vector3d::UnitX());
+                break;
+            case dh::core::RotationAxis::Y:
+                m1 = Eigen::AngleAxisd(r1, Eigen::Vector3d::UnitY());
+                break;
+            case dh::core::RotationAxis::Z:
+                m1 = Eigen::AngleAxisd(r1, Eigen::Vector3d::UnitZ());
+                break;
+            }
+
+            switch (axis2)
+            {
+            case dh::core::RotationAxis::X:
+                m2 = Eigen::AngleAxisd(r2, Eigen::Vector3d::UnitX());
+                break;
+            case dh::core::RotationAxis::Y:
+                m2 = Eigen::AngleAxisd(r2, Eigen::Vector3d::UnitY());
+                break;
+            case dh::core::RotationAxis::Z:
+                m2 = Eigen::AngleAxisd(r2, Eigen::Vector3d::UnitZ());
+                break;
+            }
+
+            switch (axis3)
+            {
+            case dh::core::RotationAxis::X:
+                m3 = Eigen::AngleAxisd(r3, Eigen::Vector3d::UnitX());
+                break;
+            case dh::core::RotationAxis::Y:
+                m3 = Eigen::AngleAxisd(r3, Eigen::Vector3d::UnitY());
+                break;
+            case dh::core::RotationAxis::Z:
+                m3 = Eigen::AngleAxisd(r3, Eigen::Vector3d::UnitZ());
+                break;
+            }
+
+            mat = m1*m2*m3;
+            return mat;
+        }
     }
 }
 
