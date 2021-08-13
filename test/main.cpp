@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-05 20:34:22
- * @LastEditTime: 2021-08-09 19:33:26
+ * @LastEditTime: 2021-08-13 17:05:45
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/main.cpp
@@ -93,10 +93,26 @@ void test_quat_add_rot(){
 void test_gravity_in_ENU(){
     double lat = 45*dh::unit::DEGREE;
     double alt = 100;
-    std::cout << dh::sins::gravity_in_ENU(lat, alt) << std::endl;
+    std::cout << dh::sins::gravity_in_enu(lat, alt) << std::endl;
 }
+
+void test_win_in_enu(){
+    double lat = 45*dh::unit::DEGREE;
+    double alt = 100;
+    double ve = 10;
+    double vn = 20;
+    std::cout << dh::sins::win_in_enu(lat, alt, ve, vn) << std::endl;
+
+}
+
+void test_sins_Mpv(){
+    double lat = 45*dh::unit::DEGREE;
+    double alt = 100;
+    std::cout << dh::sins::sins_Mpv(lat, alt) << std::endl;
+}
+
 int main(int argc, char **argv)
 {
-    test_gravity_in_ENU();
+    test_sins_Mpv();
     return 0;
 }

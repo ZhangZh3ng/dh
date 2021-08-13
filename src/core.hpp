@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-05 20:01:04
- * @LastEditTime: 2021-08-09 20:06:08
+ * @LastEditTime: 2021-08-13 16:52:14
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/include/core.hpp
@@ -152,6 +152,46 @@ namespace dh
             q(3) = cx * cy * sz + sx * sy * cz;
             q = q / q.norm();
             return q;
+        }
+
+        /**
+         * @brief Convert angle increment to angle-axis attitude.
+         * 
+         * @param alpha Angle increment in radian.
+         * @return Eigen::AngleAxis<double>& 
+         */
+        inline Eigen::AngleAxis<double> angle_increment_2_angle_axis(const Eigen::Matrix<double, 3, 1> &alpha){
+            const double mag_alpha = alpha.norm();
+            Eigen::Matrix<double, 3, 1> v_alpha = alpha/mag_alpha;
+            Eigen::AngleAxis<double> rotation_vector(mag_alpha, v_alpha);
+            return rotation_vector;
+        }
+
+        /**
+         * @brief Convert angle increment into quaternion.
+         * 
+         * @param alpha Angle increment in raian.
+         * @return Eigen::Quaternion<double>& 
+         */
+        inline Eigen::Quaternion<double> angle_increment_2_quat(const Eigen::Matrix<double, 3, 1> &alpha){
+            Eigen::AngleAxis<double> rotation_vector = dh::core::angle_increment_2_angle_axis(alpha);
+            Eigen::Quaternion<double> q(rotation_vector);
+            return q;
+        }
+
+        /**
+         * @brief Return 3d vector cross product i.e. vxr.
+         * 
+         * @param v Vector in the left.
+         * @param r Vector in the rigth.
+         * @return Eigen::Matrix<double, 3, 1> 
+         */
+        inline Eigen::Matrix<double, 3, 1> cross_product(const Eigen::Matrix<double, 3, 1> v, const Eigen::Matrix<double, 3, 1> r){
+            Eigen::Matrix<double, 3, 1> vo;
+            vo(0) = v(1)*r(2) - v(2)*r(1);
+            vo(1) = v(2)*r(0) - v(0)*r(2);
+            vo(2) = v(0)*r(1) - v(1)*r(0);
+            return vo;
         }
 
     }
