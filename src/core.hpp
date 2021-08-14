@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-05 20:01:04
- * @LastEditTime: 2021-08-13 20:59:04
+ * @LastEditTime: 2021-08-14 11:21:45
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/include/core.hpp
@@ -198,6 +198,34 @@ namespace dh
             return vo;
         }
 
+        /**
+         * @brief Return the dot product of two vector, i.e. v1*v2
+         * 
+         * @param v1 
+         * @param v2 
+         * @return double 
+         */
+        inline double dot_product(const Eigen::Matrix<double, Eigen::Dynamic, 1> v1, const Eigen::Matrix<double, Eigen::Dynamic, 1> v2)
+        {
+            int row1, row2;
+            row1 = v1.rows();
+            row2 = v2.rows();
+            if (row1 != row2)
+            {
+                throw 1;
+            }
+
+            double result = 0;
+            for (int i = 0; i < row1; i++)
+            {
+                result = result + v1(i) * v2(i);
+            }
+            return result;
+        }
+
+        /**
+         * @brief Using to indicate a rotation rotates around with which axis.
+         */
         enum RotationAxis
         {
             X,
@@ -206,7 +234,7 @@ namespace dh
         };
 
         /**
-         * @brief Convert three single euler angle to rotation matrix.
+         * @brief Convert three single euler angle to rotation matrix(i.e. direction cosine matrix).
          * 
          * @param r1 Angle of the first rotation, in radian
          * @param r2 Angle of the secound rotation.
@@ -264,7 +292,20 @@ namespace dh
                 break;
             }
 
-            mat = m1*m2*m3;
+            mat = m1 * m2 * m3;
+            return mat;
+        }
+
+        /**
+         * @brief Convert zxy euler angle into rotation matrix(i.e. direction cosine matrix).
+         * 
+         * @param rxyz 3x1 Eigen vector, which is consist of rx, ry, rz, in radian.
+         * @return Eigen::Matrix<double, 3, 3> 
+         */
+        inline Eigen::Matrix<double, 3, 3> euler_angle_2_dcm_zxy(const Eigen::Matrix<double, 3, 1> rxyz)
+        {
+            Eigen::Matrix<double, 3, 3> mat;
+            mat = dh::core::euler_angle_2_dcm(rxyz(2), rxyz(0), rxyz(1), dh::core::RotationAxis::Z, dh::core::RotationAxis::X, dh::core::RotationAxis::Y);
             return mat;
         }
     }

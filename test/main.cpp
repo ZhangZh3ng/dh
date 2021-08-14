@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-05 20:34:22
- * @LastEditTime: 2021-08-13 20:57:21
+ * @LastEditTime: 2021-08-14 11:20:39
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/main.cpp
@@ -11,6 +11,7 @@
 #include "unit.hpp"
 #include "wgs84.hpp"
 #include "sins.hpp"
+#include "ts.hpp"
 #include <iostream>
 #include <Eigen/Core>
 #include <Eigen/Eigen>
@@ -108,7 +109,7 @@ void test_win_in_enu(){
 void test_sins_Mpv(){
     double lat = 45*dh::unit::DEGREE;
     double alt = 100;
-    std::cout << dh::sins::sins_Mpv(lat, alt) << std::endl;
+    std::cout << dh::sins::sins_Mpv_enu(lat, alt) << std::endl;
 }
 
 void test_cross_product(){
@@ -140,9 +141,17 @@ void test_euler_angle_2_dcm(){
     std::cout<< mat << std::endl;
 }
 
+void test_dot_product(){
+    Eigen::Matrix<double, 4, 1> v1;
+    Eigen::Matrix<double, 4 ,1> v2;
+    v1 << 1, 2, 3, 4;
+    v2 << 5, 8, 3, 5;
+    std::cout << dh::core::dot_product(v1, v2) << std::endl;
+}
+
 
 int main(int argc, char **argv)
 {
-    test_euler_angle_2_dcm();
+    test_dot_product();
     return 0;
 }
