@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-05 20:01:04
- * @LastEditTime: 2021-08-14 11:21:45
+ * @LastEditTime: 2021-08-20 21:16:04
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/include/core.hpp
@@ -138,21 +138,27 @@ namespace dh
          * @param rz Rotation around z axis, in redian.
          * @return Eigen::Matrix<double, 4, 1> Scalar part at former.
          */
-        inline Eigen::Matrix<double, 4, 1> zxy_angle_2_quat(const double rx, const double ry, const double rz)
+        // inline Eigen::Matrix<double, 4, 1> zxy_angle_2_quat(const double rx, const double ry, const double rz)
+        // {
+        //     Eigen::Matrix<double, 4, 1> q;
+        //     double sx = std::sin(rx / 2);
+        //     double cx = std::cos(rx / 2);
+        //     double sy = std::sin(ry / 2);
+        //     double cy = std::cos(ry / 2);
+        //     double sz = std::sin(rz / 2);
+        //     double cz = std::cos(rz / 2);
+        //     q(0) = cx * cy * cz - sx * sy * sz;
+        //     q(1) = sx * cy * cz - cx * sy * sz;
+        //     q(2) = cx * sy * cz + sx * cy * sz;
+        //     q(3) = cx * cy * sz + sx * sy * cz;
+        //     q = q / q.norm();
+        //     return q;
+        // }
+
+        inline Eigen::Quaterniond euler_angle_zxy_2_quat(const double rx, const double ry, const double rz)
         {
-            Eigen::Matrix<double, 4, 1> q;
-            double sx = std::sin(rx / 2);
-            double cx = std::cos(rx / 2);
-            double sy = std::sin(ry / 2);
-            double cy = std::cos(ry / 2);
-            double sz = std::sin(rz / 2);
-            double cz = std::cos(rz / 2);
-            q(0) = cx * cy * cz - sx * sy * sz;
-            q(1) = sx * cy * cz - cx * sy * sz;
-            q(2) = cx * sy * cz + sx * cy * sz;
-            q(3) = cx * cy * sz + sx * sy * cz;
-            q = q / q.norm();
-            return q;
+
+            
         }
 
         /**
@@ -234,6 +240,16 @@ namespace dh
         };
 
         /**
+         * @brief euler angle type such as zxy, zyx...
+         * 
+         */
+        enum EulerAngleType
+        {
+            ZYX,
+            ZXY
+        };
+
+        /**
          * @brief Convert three single euler angle to rotation matrix(i.e. direction cosine matrix).
          * 
          * @param r1 Angle of the first rotation, in radian
@@ -297,17 +313,67 @@ namespace dh
         }
 
         /**
-         * @brief Convert zxy euler angle into rotation matrix(i.e. direction cosine matrix).
+         * @brief Convert zxy euler angle into rotation matrix(i.e. direction cosine matrix, dcm).
          * 
-         * @param rxyz 3x1 Eigen vector, which is consist of rx, ry, rz, in radian.
+         * @param rxyz 3x1 Eigen vector that sequentially represents rx, ry, rz, unit is radian.
          * @return Eigen::Matrix<double, 3, 3> 
          */
         inline Eigen::Matrix<double, 3, 3> euler_angle_2_dcm_zxy(const Eigen::Matrix<double, 3, 1> rxyz)
         {
-            Eigen::Matrix<double, 3, 3> mat;
-            mat = dh::core::euler_angle_2_dcm(rxyz(2), rxyz(0), rxyz(1), dh::core::RotationAxis::Z, dh::core::RotationAxis::X, dh::core::RotationAxis::Y);
-            return mat;
+            Eigen::Matrix<double, 3, 3> dcm;
+            dcm = dh::core::euler_angle_2_dcm(rxyz(2), rxyz(0), rxyz(1), dh::core::RotationAxis::Z, dh::core::RotationAxis::X, dh::core::RotationAxis::Y);
+            return dcm;
         }
+
+        /**
+         * @brief Convert zxy euler angle into rotation matrix(i.e. direction cosine matrix, dcm).
+         * 
+         * @param rx rotation around x axis in radian.
+         * @param ry rotation around y axis in radian.
+         * @param rz rotation around z axis in radian.
+         * @return Eigen::Matrix<double, 3, 3> 
+         */
+        inline Eigen::Matrix<double, 3, 3> euler_angle_2_dcm_zxy(const double rx, const double ry, const double rz)
+        {
+            Eigen::Matrix<double, 3, 3> dcm;
+            dcm = dh::core::euler_angle_2_dcm(rz, rx, ry, dh::core::RotationAxis::Z, dh::core::RotationAxis::X, dh::core::RotationAxis::Y);
+            return dcm;
+        }
+
+        /**
+         * @brief Convert zyx euler angle into rotation matrix(i.e. direction cosine matrix, dcm).
+         * 
+         * @param rxyz 3x1 Eigen vector that sequentially represents rx, ry, rz, unit is radian.
+         * @return Eigen::Matrix<double, 3, 3> 
+         */
+        inline Eigen::Matrix<double, 3, 3> euler_angle_2_dcm_zyx(const Eigen::Matrix<double, 3, 1> rxyz)
+        {
+            Eigen::Matrix<double, 3, 3> dcm;
+            dcm = dh::core::euler_angle_2_dcm(rxyz(2), rxyz(1), rxyz(0), dh::core::RotationAxis::Z, dh::core::RotationAxis::Y, dh::core::RotationAxis::X);
+            return dcm;
+        }
+
+        /**
+         * @brief Convert zyx euler angle into rotation matrix(i.e. direction cosine matrix, dcm).
+         * 
+         * @param rx rotation around x axis in radian.
+         * @param ry rotation around y axis in radian.
+         * @param rz rotation around z axis in radian.
+         * @return Eigen::Matrix<double, 3, 3> 
+         */
+        inline Eigen::Matrix<double, 3, 3> euler_angle_2_dcm_zyx(const double rx, const double ry, const double rz)
+        {
+            Eigen::Matrix<double, 3, 3> dcm;
+            dcm = dh::core::euler_angle_2_dcm(rz, ry, rx, dh::core::RotationAxis::Z, dh::core::RotationAxis::Y, dh::core::RotationAxis::X);
+            return dcm;
+        }
+
+        inline Eigen::Quaterniond euler_angle_2_quat_zxy(const double rx, const double ry, const double rz){
+            Eigen::Quaterniond q = Eigen::Quaterniond(dh::core::euler_angle_2_dcm_zxy(rx, ry, rz));
+            return q;
+
+        }
+
     }
 }
 

@@ -66,6 +66,9 @@
         "typeinfo": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "core": "cpp"
+        "core": "cpp",
+        "*.ipp": "cpp",
+        "csetjmp": "cpp",
+        "unordered_set": "cpp"
     }
 }
