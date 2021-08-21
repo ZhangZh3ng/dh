@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-20 19:06:51
- * @LastEditTime: 2021-08-20 19:28:38
+ * @LastEditTime: 2021-08-21 16:05:44
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/enum.hpp
@@ -40,19 +40,28 @@ namespace dh
          */
         enum MessageType
         {
+            LABEL,
+            INDEX,
             TIME_STAMP,
             START_TIME,
             END_TIME,
             PITCH_RATE,
             ROLL_RATE,
             YAW_RATE,
+            ANGULAR_VELOCITY_IN_BODY_X,
+            ANGULAR_VELOCITY_IN_BODY_Y,
+            ANGULAR_VELOCITY_IN_BODY_Z,
             ACCELERATION_IN_BODY_X,
             ACCELERATION_IN_BODY_Y,
             ACCELERATION_IN_BODY_Z,
             ACCELERATION_IN_FORWARD,
             ACCELERATION_IN_RIGTH,
-            ACCELERATION_IN_UP,
-            LABEL
+            ACCELERATION_IN_UP
+        };
+
+        enum TrajectoryFormat
+        {
+            FORMAT_0
         };
     }
 }

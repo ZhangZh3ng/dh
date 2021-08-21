@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-21 08:05:59
- * @LastEditTime: 2021-08-21 11:30:51
+ * @LastEditTime: 2021-08-21 17:13:48
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/geometry.hpp
@@ -222,7 +222,7 @@ namespace dh
          * @brief convert direction cosine matrix(dcm) to (yaw pitch roll)
          * 
          * @param dcm 
-         * @param type a dh::type::EulerAngleType, default is zyx
+         * @param type a dh::type::EulerAngleType, default is zxy
          * @return Eigen::Vector3d 
          */
         inline Eigen::Vector3d dcm_to_ypr(const Eigen::Matrix<double, 3, 3> dcm, dh::type::EulerAngleType type = dh::type::ZXY)
@@ -271,7 +271,7 @@ namespace dh
          * @brief convert quaternion to yaw pitch roll
          * 
          * @param q eigen quaternion
-         * @param type a dh::type::EulerAngleType, default is zyx
+         * @param type a dh::type::EulerAngleType, default is zxy
          * @return Eigen::Vector3d 
          */
         inline Eigen::Vector3d quat_to_ypr(const Eigen::Quaterniond q, dh::type::EulerAngleType type = dh::type::ZXY)
@@ -304,6 +304,31 @@ namespace dh
         }
 
         /**
+         * @brief convert ypr angle to direction cosine matrix(dcm).
+         * 
+         * @param yaw 
+         * @param pitch 
+         * @param roll 
+         * @param type  a dh::type::EulerAngleType type value, default value is ZXY
+         * @return Eigen::Matrix<double, 3, 3> 
+         */
+        inline Eigen::Matrix<double, 3, 3> ypr_to_dcm(const double yaw, const double pitch, const double roll, const dh::type::EulerAngleType type = dh::type::EulerAngleType::ZXY)
+        {
+            Eigen::Matrix<double, 3, 3> dcm;
+            switch (type)
+            {
+            case dh::type::EulerAngleType::ZXY:
+                dcm = dh::geometry::zxy_euler_angle_to_dcm(yaw, pitch, roll);
+                break;
+            case dh::type::EulerAngleType::ZYX:
+                dcm = dh::geometry::zyx_euler_angle_to_dcm(yaw, pitch, roll);
+            default:
+                throw 1;
+            }
+            return dcm;
+        }
+
+        /**
          * @brief convert ypr angle to quaternion
          * 
          * @param ypr 
@@ -316,9 +341,57 @@ namespace dh
             return q;
         }
 
+        /**
+         * @brief 
+         * 
+         * @param yaw 
+         * @param pitch 
+         * @param roll 
+         * @param type 
+         * @return Eigen::Quaterniond 
+         */
+        inline Eigen::Quaterniond ypr_to_quat(const double yaw, const double pitch, const double roll, const dh::type::EulerAngleType type = dh::type::EulerAngleType::ZXY)
+        {
+            Eigen::Quaterniond q = Eigen::Quaterniond(dh::geometry::ypr_to_dcm(yaw, pitch, roll, type));
+            return q;
+        }
+        
         /***************************************************************************
-         *                          quaternion update    todo                       *
+         *                          quaternion update                               *
          ***************************************************************************/
+        
+        /**
+         * @brief q = q*q(rot);
+         * 
+         * @param q eigen quaternion
+         * @param rot angle increment
+         * @return Eigen::Quaterniond 
+         */
+        inline Eigen::Quaterniond quat_add_rot(const Eigen::Quaterniond q, const Eigen::Vector3d rot)
+        {
+            Eigen::Matrix<double, 4, 1> dq;
+            const double norm_rot = rot.norm();
+            const double sin_half_norm_rot = std::sin(norm_rot / 2);
+            dq(0) = std::cos(norm_rot / 2);
+            dq(1) = rot(0) / norm_rot * sin_half_norm_rot;
+            dq(2) = rot(1) / norm_rot * sin_half_norm_rot;
+            dq(3) = rot(2) / norm_rot * sin_half_norm_rot;
+            return q*Eigen::Quaterniond(dq(0), dq(1), dq(2), dq(3));
+        }
+
+        inline Eigen::Quaterniond quat_add_rot(const Eigen::Quaterniond q, const double rotx, const double roty, const double rotz)
+        {
+            Eigen::Matrix<double, 4, 1> dq;
+            Eigen::Vector3d rot;
+            rot << rotx, roty, rotz;
+            const double norm_rot = rot.norm();
+            const double sin_half_norm_rot = std::sin(norm_rot / 2);
+            dq(0) = std::cos(norm_rot / 2);
+            dq(1) = rot(0) / norm_rot * sin_half_norm_rot;
+            dq(2) = rot(1) / norm_rot * sin_half_norm_rot;
+            dq(3) = rot(2) / norm_rot * sin_half_norm_rot;
+            return q*Eigen::Quaterniond(dq(0), dq(1), dq(2), dq(3));
+        }
 
     } // namespace geometry
 } // namespace dh
