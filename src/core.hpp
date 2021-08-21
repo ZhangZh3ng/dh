@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-05 20:01:04
- * @LastEditTime: 2021-08-20 21:16:04
+ * @LastEditTime: 2021-08-21 11:21:17
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/include/core.hpp
@@ -138,28 +138,28 @@ namespace dh
          * @param rz Rotation around z axis, in redian.
          * @return Eigen::Matrix<double, 4, 1> Scalar part at former.
          */
-        // inline Eigen::Matrix<double, 4, 1> zxy_angle_2_quat(const double rx, const double ry, const double rz)
-        // {
-        //     Eigen::Matrix<double, 4, 1> q;
-        //     double sx = std::sin(rx / 2);
-        //     double cx = std::cos(rx / 2);
-        //     double sy = std::sin(ry / 2);
-        //     double cy = std::cos(ry / 2);
-        //     double sz = std::sin(rz / 2);
-        //     double cz = std::cos(rz / 2);
-        //     q(0) = cx * cy * cz - sx * sy * sz;
-        //     q(1) = sx * cy * cz - cx * sy * sz;
-        //     q(2) = cx * sy * cz + sx * cy * sz;
-        //     q(3) = cx * cy * sz + sx * sy * cz;
-        //     q = q / q.norm();
-        //     return q;
-        // }
+        // // inline Eigen::Matrix<double, 4, 1> zxy_angle_2_quat(const double rx, const double ry, const double rz)
+        // // {
+        // //     Eigen::Matrix<double, 4, 1> q;
+        // //     double sx = std::sin(rx / 2);
+        // //     double cx = std::cos(rx / 2);
+        // //     double sy = std::sin(ry / 2);
+        // //     double cy = std::cos(ry / 2);
+        // //     double sz = std::sin(rz / 2);
+        // //     double cz = std::cos(rz / 2);
+        // //     q(0) = cx * cy * cz - sx * sy * sz;
+        // //     q(1) = sx * cy * cz - cx * sy * sz;
+        // //     q(2) = cx * sy * cz + sx * cy * sz;
+        // //     q(3) = cx * cy * sz + sx * sy * cz;
+        // //     q = q / q.norm();
+        // //     return q;
+        // // }
 
-        inline Eigen::Quaterniond euler_angle_zxy_2_quat(const double rx, const double ry, const double rz)
-        {
+        // // inline Eigen::Quaterniond euler_angle_zxy_2_quat(const double rx, const double ry, const double rz)
+        // // {
 
             
-        }
+        // // }
 
         /**
          * @brief Convert angle increment to angle-axis attitude.

@@ -7,7 +7,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src
 find_package( Ceres REQUIRED )
 include_directories( ${CERES_INCLUDE_DIRS} )
 
-add_executable(main main.cpp)
+add_executable(main main2.cpp)
 add_executable(read readfile.cpp)
 add_executable(opt1 opt1.cpp)
 # add_executable(opt2 opt2.cpp)

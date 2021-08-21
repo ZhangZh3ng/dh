@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-05 20:34:22
- * @LastEditTime: 2021-08-20 20:15:34
+ * @LastEditTime: 2021-08-21 09:09:58
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/main.cpp
@@ -13,6 +13,7 @@
 #include "sins.hpp"
 #include "tg.hpp"
 #include "read.hpp"
+#include "geometry.hpp"
 #include <iostream>
 #include <Eigen/Core>
 #include <Eigen/Eigen>
@@ -43,14 +44,14 @@ void test_earth_radii()
     std::cout << dh::sins::earth_radii(lat) << std::endl;
 }
 
-void test_zxy_angle_2_quat()
-{
-    double rx = 10 * dh::unit::DEGREE;
-    double ry = 20 * dh::unit::DEGREE;
-    double rz = 30 * dh::unit::DEGREE;
-    std::cout << rx << ry << rz << std::endl;
-    std::cout << dh::core::zxy_angle_2_quat(rx, ry, rz) << std::endl;
-}
+// void test_zxy_angle_2_quat()
+// {
+//     double rx = 10 * dh::unit::DEGREE;
+//     double ry = 20 * dh::unit::DEGREE;
+//     double rz = 30 * dh::unit::DEGREE;
+//     std::cout << rx << ry << rz << std::endl;
+//     std::cout << dh::core::zxy_angle_2_quat(rx, ry, rz) << std::endl;
+// }
 
 void test_quat_multiply_quat()
 {
@@ -61,40 +62,40 @@ void test_quat_multiply_quat()
     std::cout << dh::core::quat_multiply_quat(ql, qr) << std::endl;
 }
 
-void test_quat_multiply_vec()
-{
-    Eigen::Matrix<double, 4, 1> q1;
-    Eigen::Matrix<double, 4, 1> q2;
-    Eigen::Matrix<double, 3, 1> vec;
-    q1 << 1, 0, 1, 0;
-    q2 << 1, 0.5, 0.3, 0.1;
-    vec << 1, -2, 3;
-    std::cout << dh::core::quat_multiply_vec(q1, vec) << std::endl;
-    std::cout << dh::core::quat_multiply_vec(q2, vec) << std::endl;
+// void test_quat_multiply_vec()
+// {
+//     Eigen::Matrix<double, 4, 1> q1;
+//     Eigen::Matrix<double, 4, 1> q2;
+//     Eigen::Matrix<double, 3, 1> vec;
+//     q1 << 1, 0, 1, 0;
+//     q2 << 1, 0.5, 0.3, 0.1;
+//     vec << 1, -2, 3;
+//     std::cout << dh::core::quat_multiply_vec(q1, vec) << std::endl;
+//     std::cout << dh::core::quat_multiply_vec(q2, vec) << std::endl;
 
-    double rx = 10 * dh::unit::DEGREE;
-    double ry = 20 * dh::unit::DEGREE;
-    double rz = 30 * dh::unit::DEGREE;
-    std::cout << rx << ry << rz << std::endl;
-    q1 = dh::core::zxy_angle_2_quat(rx, ry, rz);
-    std::cout << dh::core::quat_multiply_vec(q1, vec) << std::endl;
-}
+//     double rx = 10 * dh::unit::DEGREE;
+//     double ry = 20 * dh::unit::DEGREE;
+//     double rz = 30 * dh::unit::DEGREE;
+//     std::cout << rx << ry << rz << std::endl;
+//     q1 = dh::core::zxy_angle_2_quat(rx, ry, rz);
+//     std::cout << dh::core::quat_multiply_vec(q1, vec) << std::endl;
+// }
 
-void test_quat_add_rot()
-{
-    Eigen::Matrix<double, 3, 1> r1;
-    Eigen::Matrix<double, 3, 1> r2;
-    Eigen::Matrix<double, 4, 1> q1;
-    Eigen::Matrix<double, 4, 1> q2;
+// void test_quat_add_rot()
+// {
+//     Eigen::Matrix<double, 3, 1> r1;
+//     Eigen::Matrix<double, 3, 1> r2;
+//     Eigen::Matrix<double, 4, 1> q1;
+//     Eigen::Matrix<double, 4, 1> q2;
 
-    r1 << 10 * dh::unit::DEGREE, 20 * dh::unit::DEGREE, 30 * dh::unit::DEGREE;
-    r2 << 5 * dh::unit::DEGREE, 10 * dh::unit::DEGREE, 256 * dh::unit::DEGREE;
+//     r1 << 10 * dh::unit::DEGREE, 20 * dh::unit::DEGREE, 30 * dh::unit::DEGREE;
+//     r2 << 5 * dh::unit::DEGREE, 10 * dh::unit::DEGREE, 256 * dh::unit::DEGREE;
 
-    q1 = dh::core::zxy_angle_2_quat(r1(0), r1(1), r1(2));
-    std::cout << q1 << std::endl;
-    std::cout << r2 << std::endl;
-    std::cout << dh::core::quat_add_rot(q1, r2) << std::endl;
-}
+//     q1 = dh::core::zxy_angle_2_quat(r1(0), r1(1), r1(2));
+//     std::cout << q1 << std::endl;
+//     std::cout << r2 << std::endl;
+//     std::cout << dh::core::quat_add_rot(q1, r2) << std::endl;
+// }
 
 void test_gravity_in_ENU()
 {
@@ -176,16 +177,16 @@ void test_eigen_vector_data(){
 }
 
 
-void test_tg_cartesian3d(){
-    dh::tg::TrajectoryGeneratorIn3DCartesianFrame traj;
-    std::cout << traj.init_q.coeffs() << std::endl;
-    std::cout << traj.init_position << std::endl;
-}
+// void test_tg_cartesian3d(){
+//     dh::tg::TrajectoryGeneratorIn3DCartesianFrame traj;
+//     std::cout << traj.init_q.coeffs() << std::endl;
+//     std::cout << traj.init_position << std::endl;
+// }
 
-void test_motion3d(){
-    dh::tg::Motion3D m(1*dh::unit::DEGREE, 2*dh::unit::DEGREE, 30*dh::unit::DEGREE, 0, 0, 0, 0, 0, 0)
+// void test_motion3d(){
+//     dh::tg::Motion3D m(1*dh::unit::DEGREE, 2*dh::unit::DEGREE, 30*dh::unit::DEGREE, 0, 0, 0, 0, 0, 0)
 
-}
+// }
 
 void test_vectory(){
     
@@ -204,10 +205,23 @@ void test_vectory(){
     std::cout << a[1][2] << std::endl;
 }
 
+void test_dcm_2_quat(){
+    Eigen::Matrix<double, 3, 3> mat = Eigen::Matrix<double, 3, 3>::Identity();
+    Eigen::Quaterniond q = dh::geometry::dcm_to_quat(mat);
+    std::cout << q.coeffs() << std::endl;
+}
+
+void test_zxy_to_quat(){
+    Eigen::Vector3d v;
+    v << 1*dh::unit::degree, 2*dh::unit::degree, 30*dh::unit::degree;
+    Eigen::Quaterniond q = dh::geometry::zxy_euler_angle_to_quat(v);
+    std::cout << q.coeffs() << std::endl;
+}
+
 int main(int argc, char **argv)
 {
     // std::string path = argv[1];
-    test_vectory();
+    test_zxy_to_quat();
     
     return 0;
 }
