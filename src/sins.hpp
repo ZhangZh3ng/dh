@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-07 10:02:48
- * @LastEditTime: 2021-08-13 17:15:49
+ * @LastEditTime: 2021-08-14 10:28:30
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/sins.hpp
@@ -109,7 +109,7 @@ namespace dh
          * @param alt Altitude in meter.
          * @return Eigen::Matrix<double, 3 ,3> 
          */
-        inline Eigen::Matrix<double, 3, 3> sins_Mpv(const double lat, const double alt)
+        inline Eigen::Matrix<double, 3, 3> sins_Mpv_enu(const double lat, const double alt)
         {
             Eigen::Matrix<double, 3, 3> mat;
             Eigen::Matrix<double, 2, 1> Rmn = dh::sins::earth_radii(lat);
@@ -158,7 +158,7 @@ namespace dh
 
             vel1 = vel0 + a_nb_n * time_length;
             vel_avg = (vel0 + vel1) / 2;
-            Eigen::Matrix<double, 3, 3> mpv = dh::sins::sins_Mpv(ins.latitude, ins.altitude);
+            Eigen::Matrix<double, 3, 3> mpv = dh::sins::sins_Mpv_enu(ins.latitude, ins.altitude);
             Eigen::Matrix<double, 3, 1> pos0, pos1;
             pos0 << ins.latitude, ins.longitude, ins.altitude;
             pos1 = pos0 + mpv * vel_avg * time_length;
