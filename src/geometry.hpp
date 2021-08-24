@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-21 08:05:59
- * @LastEditTime: 2021-08-21 17:13:48
+ * @LastEditTime: 2021-08-24 09:26:54
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/geometry.hpp
@@ -355,11 +355,24 @@ namespace dh
             Eigen::Quaterniond q = Eigen::Quaterniond(dh::geometry::ypr_to_dcm(yaw, pitch, roll, type));
             return q;
         }
-        
+
         /***************************************************************************
          *                          quaternion update                               *
          ***************************************************************************/
-        
+
+        inline Eigen::Quaterniond rot_to_quat(const Eigen::Vector3d rot)
+        {
+            double w, x, y, z;
+            const double norm_rot = rot.norm();
+            const double sin_half_norm_rot = std::sin(norm_rot / 2);
+            w = std::cos(norm_rot / 2);
+            x = rot(0) / norm_rot * sin_half_norm_rot;
+            y = rot(1) / norm_rot * sin_half_norm_rot;
+            z = rot(2) / norm_rot * sin_half_norm_rot;
+            Eigen::Quaterniond q = Eigen::Quaterniond(w, x, y, z);
+            return q;
+        }
+
         /**
          * @brief q = q*q(rot);
          * 
@@ -367,30 +380,32 @@ namespace dh
          * @param rot angle increment
          * @return Eigen::Quaterniond 
          */
-        inline Eigen::Quaterniond quat_add_rot(const Eigen::Quaterniond q, const Eigen::Vector3d rot)
+        inline const Eigen::Quaterniond &quat_add_rot(Eigen::Quaterniond &q, const Eigen::Vector3d &rot)
         {
-            Eigen::Matrix<double, 4, 1> dq;
             const double norm_rot = rot.norm();
             const double sin_half_norm_rot = std::sin(norm_rot / 2);
-            dq(0) = std::cos(norm_rot / 2);
-            dq(1) = rot(0) / norm_rot * sin_half_norm_rot;
-            dq(2) = rot(1) / norm_rot * sin_half_norm_rot;
-            dq(3) = rot(2) / norm_rot * sin_half_norm_rot;
-            return q*Eigen::Quaterniond(dq(0), dq(1), dq(2), dq(3));
+            double w, x, y, z;
+            w = std::cos(norm_rot / 2);
+            x = rot(0) / norm_rot * sin_half_norm_rot;
+            y = rot(1) / norm_rot * sin_half_norm_rot;
+            z = rot(2) / norm_rot * sin_half_norm_rot;
+            Eigen::Quaterniond dq = Eigen::Quaterniond(w, x, y, z);
+            q = q * dq;
+            return q;
         }
 
-        inline Eigen::Quaterniond quat_add_rot(const Eigen::Quaterniond q, const double rotx, const double roty, const double rotz)
+        inline const Eigen::Quaterniond &quat_add_rot(Eigen::Quaterniond &q, const double &rotx, const double &roty, const double &rotz)
         {
-            Eigen::Matrix<double, 4, 1> dq;
-            Eigen::Vector3d rot;
-            rot << rotx, roty, rotz;
-            const double norm_rot = rot.norm();
+            const double norm_rot = std::pow(rotx * rotx + roty * roty + rotz * rotz, 0.5);
             const double sin_half_norm_rot = std::sin(norm_rot / 2);
-            dq(0) = std::cos(norm_rot / 2);
-            dq(1) = rot(0) / norm_rot * sin_half_norm_rot;
-            dq(2) = rot(1) / norm_rot * sin_half_norm_rot;
-            dq(3) = rot(2) / norm_rot * sin_half_norm_rot;
-            return q*Eigen::Quaterniond(dq(0), dq(1), dq(2), dq(3));
+            double w, x, y, z;
+            w = std::cos(norm_rot / 2);
+            x = rotx / norm_rot * sin_half_norm_rot;
+            y = roty / norm_rot * sin_half_norm_rot;
+            z = rotz / norm_rot * sin_half_norm_rot;
+            Eigen::Quaterniond dq = Eigen::Quaterniond(w, x, y, z);
+            q = q * dq;
+            return q;
         }
 
     } // namespace geometry
