@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-14 10:25:36
- * @LastEditTime: 2021-08-21 17:30:25
+ * @LastEditTime: 2021-08-24 09:40:30
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/ts.hpp
@@ -19,6 +19,7 @@
 #include "type.hpp"
 #include <vector>
 #include "geometry.hpp"
+#include <memory>
 
 namespace dh
 {
@@ -38,13 +39,8 @@ namespace dh
             double init_py = 0;
             double init_pz = 0;
 
-            //
-            int reference_frame = 0;
-
+            // the summation of all motion's lasting time.
             double total_time = 0;
-
-            // format of motion list.
-            dh::type::TrajectoryFormat motion_list_format = dh::type::TrajectoryFormat::FORMAT_0;
 
             // motion number.
             int motion_list_row = 0;
@@ -53,15 +49,15 @@ namespace dh
             int motion_list_col = 9;
 
             /**
-             *  a vector to stroe all motion infomation, it can be save in different format.
-             * Format0:
+             * a vector restoring all motion infomation, it format:
              * 1.index  2.start time 3.end time 4.wy 5.wp 6.wr 7.ax 8.ay 9.az
+             * 10.index 11.start time ...
              * 
              */
             std::vector<double> motion_list;
 
             /**
-             * @brief Construct a new Trajectory 3 D object
+             * @brief constructs and initializes the trajectory. 
              * 
              * @param pitch initial pitch angle, unit is radian, so as to roll and yaw.
              * @param roll 
@@ -76,7 +72,7 @@ namespace dh
             Trajectory3D(const double pitch, const double roll, const double yaw, const double vx, const double vy, const double vz, const double px, const double py, const double pz) : init_pitch(pitch), init_roll(roll), init_yaw(yaw), init_vx(vx), init_vy(vy), init_vz(vz), init_px(px), init_py(py), init_pz(pz) {}
 
             /**
-             * @brief Construct a new Trajectory 3 D object, we will set the initial navigation parameters while constructing object.
+             * @brief constructs and initializes the trajectory. 
              * 
              * @param ypr 
              * @param vxyz 
@@ -96,7 +92,7 @@ namespace dh
             }
 
             /**
-             * @brief add a motion to this trajectory
+             * @brief add a motion
              * 
              * @param lasting_time unit is s
              * @param wy yaw rate, unit is rad/s.
@@ -110,75 +106,68 @@ namespace dh
              */
             bool add_motion(double lasting_time, double wy, double wp, double wr, double ax, double ay, double az)
             {
-                switch (this->motion_list_format)
-                {
-                case 0:
-                    double end_time = this->total_time + lasting_time;
-                    this->motion_list.push_back(++this->motion_list_row);
-                    this->motion_list.push_back(this->total_time);
-                    this->motion_list.push_back(end_time);
-                    this->motion_list.push_back(wy);
-                    this->motion_list.push_back(wp);
-                    this->motion_list.push_back(wr);
-                    this->motion_list.push_back(ax);
-                    this->motion_list.push_back(ay);
-                    this->motion_list.push_back(az);
-                    this->total_time = end_time;
-                    break;
-                default:
-                    break;
-                }
+
+                double end_time = this->total_time + lasting_time;
+                this->motion_list.push_back(++this->motion_list_row);
+                this->motion_list.push_back(this->total_time);
+                this->motion_list.push_back(end_time);
+                this->motion_list.push_back(wy);
+                this->motion_list.push_back(wp);
+                this->motion_list.push_back(wr);
+                this->motion_list.push_back(ax);
+                this->motion_list.push_back(ay);
+                this->motion_list.push_back(az);
+                this->total_time = end_time;
+
                 return true;
             }
         };
 
         class TrajectoryGenerator
         {
-            // trajectory.
-            const dh::tg::Trajectory3D & trajectory;
 
             int output_format = 0;
 
             double step_time = 0.01;
 
-            std::vector<double> &generate()
+            const std::vector<double> &generate(const dh::tg::Trajectory3D &trajectory)
             {
 
-                std::vector<double> data;
+                std::shared_ptr<std::vector<double>> data(new std::vector<double>);
                 unsigned int epoch = 0;
                 double dvx, dvy, dvz, dwy, dwp, dwr, time_stamp = 0;
 
                 Eigen::Vector3d ypr;
-                ypr << this->trajectory.init_yaw, this->trajectory.init_pitch, this->trajectory.init_roll;
+                ypr << trajectory.init_yaw, trajectory.init_pitch, trajectory.init_roll;
 
                 Eigen::Quaterniond q = dh::geometry::ypr_to_quat(ypr);
 
                 Eigen::Vector3d pos;
-                pos << this->trajectory.init_px, this->trajectory.init_py, this->trajectory.init_pz;
+                pos << trajectory.init_px, trajectory.init_py, trajectory.init_pz;
 
                 Eigen::Vector3d vb, vn, vb0, vn0;
-                vb << this->trajectory.init_vx, this->trajectory.init_vy, this->trajectory.init_vz;
+                vb << trajectory.init_vx, trajectory.init_vy, trajectory.init_vz;
                 vn = q * vb;
                 vb0 = vb;
                 vn0 = vn0;
 
                 // white initial navigation parameters.
-                this->write_line(data, time_stamp, q, pos, vn);
+                this->write_line(*data, time_stamp, q, pos, vn);
 
-                int col = this->trajectory.motion_list_col;
+                int col = trajectory.motion_list_col;
 
-                for (int k = 0; k < this->trajectory.motion_list_row; k++)
+                for (int k = 0; k < trajectory.motion_list_row; k++)
                 {
                     time_stamp += this->step_time;
-                    while (time_stamp >= this->trajectory.motion_list[k * col + 1] && time_stamp < this->trajectory.motion_list[k * col + 2])
+                    while (time_stamp >= trajectory.motion_list[k * col + 1] && time_stamp < trajectory.motion_list[k * col + 2])
                     {
                         // read motion information.
-                        dwy = this->trajectory.motion_list[k * col + 3] * this->step_time;
-                        dwp = this->trajectory.motion_list[k * col + 4] * this->step_time;
-                        dwr = this->trajectory.motion_list[k * col + 5] * this->step_time;
-                        dvx = this->trajectory.motion_list[k * col + 6] * this->step_time;
-                        dvy = this->trajectory.motion_list[k * col + 7] * this->step_time;
-                        dvz = this->trajectory.motion_list[k * col + 8] * this->step_time;
+                        dwy = trajectory.motion_list[k * col + 3] * this->step_time;
+                        dwp = trajectory.motion_list[k * col + 4] * this->step_time;
+                        dwr = trajectory.motion_list[k * col + 5] * this->step_time;
+                        dvx = trajectory.motion_list[k * col + 6] * this->step_time;
+                        dvy = trajectory.motion_list[k * col + 7] * this->step_time;
+                        dvz = trajectory.motion_list[k * col + 8] * this->step_time;
 
                         // because euler angle was used in Trajectory to indicate attitude change, so directly using euler angle update is more convenient.
                         ypr(0) += dwy;
@@ -202,13 +191,13 @@ namespace dh
                         vn0 = vn;
 
                         // record data.
-                        this->write_line(data, time_stamp, q, pos, vn);
+                        this->write_line(*data, time_stamp, q, pos, vn);
 
                         // update time stamp.
                         time_stamp += this->step_time;
                     }
                 }
-                return data;
+                return *data;
             }
 
         private:

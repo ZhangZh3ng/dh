@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-21 09:23:17
- * @LastEditTime: 2021-08-21 11:20:02
+ * @LastEditTime: 2021-08-24 09:29:22
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/main2.cpp
@@ -40,12 +40,26 @@ void test_utils(){
     Eigen::Vector3d v;
     v << 1, 2, 3;
     std::cout << dh::utils::askew(v) << std::endl;
+    
+}
+
+void test_eigen_quat(){
+    Eigen::Vector3d rot;
+    // Eigen::Quaterniond q = Eigen::Quaterniond(rot);
+    // std::cout << q.coeffs() << std::declare_reachable;
+}
+
+void test_tg(){
+    double yaw = 30*dh::unit::degree;
+    double pitch = 1*dh::unit::degree;
+    double roll = 0*dh::unit::degree;
+    dh::tg::Trajectory3D mt();
 }
 
 int main(int argc, char **argv)
 {
     // std::string path = argv[1];
-    test_utils();
+    test_eigen_quat();
     
     return 0;
 }

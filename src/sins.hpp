@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-07 10:02:48
- * @LastEditTime: 2021-08-14 10:28:30
+ * @LastEditTime: 2021-08-23 10:12:53
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/sins.hpp
@@ -172,6 +172,34 @@ namespace dh
 
             return ins;
         }
+
+        class SINSParameter
+        {
+        public:
+            // quaternion s.t. q*vb = vn.
+            Eigen::Quaterniond m_q = Eigen::Quaterniond::Identity();
+            // coordinate of ground velocity in navigation frame.
+            Eigen::Vector3d m_vn = Eigen::Vector3d::Zero();
+            // latitude(rad), longitude(rad), altitude(m)
+            Eigen::Vector3d m_lla = Eigen::Vector3d::Zero();
+
+            // imu output time interval.
+            double m_time_length = 0.01;
+
+            SINSParameter(const Eigen::Quaterniond q, const Eigen::Vector3d vn, const Eigen::Vector3d lla) : m_q(q), m_vn(vn), m_lla(lla) {}
+
+            void update(const Eigen::Vector3d w, const Eigen::Vector3d f)
+            {
+                Eigen::Quaterniond qbn0, qbtb0, qntn0;
+                qbn0 = this->m_q;
+                double lat0 = this->m_lla(0);
+                double lon0 = this->m_lla(1);
+                double alt0 = this->m_lla(2);
+                
+                // attitude update
+                
+            }
+        };
     }
 }
 
