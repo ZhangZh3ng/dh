@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-14 10:25:36
- * @LastEditTime: 2021-08-24 09:40:30
+ * @LastEditTime: 2021-08-24 14:48:01
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/ts.hpp
@@ -23,7 +23,7 @@
 
 namespace dh
 {
-    namespace tg // tg means trajectory generator.
+    namespace tg // tg = trajectory generator.
     {
         class Trajectory3D
         {
@@ -59,17 +59,17 @@ namespace dh
             /**
              * @brief constructs and initializes the trajectory. 
              * 
-             * @param pitch initial pitch angle, unit is radian, so as to roll and yaw.
-             * @param roll 
-             * @param yaw 
-             * @param vx velocity w.r.t body x axis, unnit is m/s.
-             * @param vy 
-             * @param vz 
-             * @param px 
-             * @param py 
-             * @param pz 
+             * @param yaw initial yaw angle, unit is radian
+             * @param pitch initial pitch
+             * @param roll initial roll
+             * @param vx initial velocity w.r.t body x axis, unit is m/s.
+             * @param vy initial velocity w.r.t body y axis, unit is m/s.
+             * @param vz initial velocity w.r.t body z axis, unit is m/s.
+             * @param px initial x position, unit is m.
+             * @param py initial y position, unit is m.
+             * @param pz initial z position, unit is m.
              */
-            Trajectory3D(const double pitch, const double roll, const double yaw, const double vx, const double vy, const double vz, const double px, const double py, const double pz) : init_pitch(pitch), init_roll(roll), init_yaw(yaw), init_vx(vx), init_vy(vy), init_vz(vz), init_px(px), init_py(py), init_pz(pz) {}
+            Trajectory3D(const double yaw, const double pitch, const double roll, const double vx, const double vy, const double vz, const double px, const double py, const double pz) : init_yaw(yaw), init_pitch(pitch), init_roll(roll), init_vx(vx), init_vy(vy), init_vz(vz), init_px(px), init_py(py), init_pz(pz) {}
 
             /**
              * @brief constructs and initializes the trajectory. 
@@ -92,21 +92,20 @@ namespace dh
             }
 
             /**
-             * @brief add a motion
+             * @brief add a motion using client given parameters.
              * 
              * @param lasting_time unit is s
              * @param wy yaw rate, unit is rad/s.
              * @param wp pitch rate
              * @param wr roll rate
              * @param ax acceleration in direction of BODY x axis, unit is m/s^2
-             * @param ay 
-             * @param az 
+             * @param ay acceleration in direction of BODY y axis
+             * @param az acceleration in direction of BODY z axis
              * @return true 
              * @return false 
              */
             bool add_motion(double lasting_time, double wy, double wp, double wr, double ax, double ay, double az)
             {
-
                 double end_time = this->total_time + lasting_time;
                 this->motion_list.push_back(++this->motion_list_row);
                 this->motion_list.push_back(this->total_time);
@@ -125,55 +124,66 @@ namespace dh
 
         class TrajectoryGenerator
         {
-
-            int output_format = 0;
-
+        public:
             double step_time = 0.01;
 
-            const std::vector<double> &generate(const dh::tg::Trajectory3D &trajectory)
+            dh::type::EulerAngleType euler_angle_type = dh::type::EulerAngleType::ZXY;
+
+            const double generate(const dh::tg::Trajectory3D &trajectory, std::vector<double> &data)
             {
+                // total epochs, including initial value.
+                unsigned int epoch = 1;
 
-                std::shared_ptr<std::vector<double>> data(new std::vector<double>);
-                unsigned int epoch = 0;
-                double dvx, dvy, dvz, dwy, dwp, dwr, time_stamp = 0;
+                // velocity increment and euler angle increment.
+                double dvx, dvy, dvz, dyaw, dpitch, droll, time_stamp = 0;
 
+                // [yaw pitch roll]
                 Eigen::Vector3d ypr;
                 ypr << trajectory.init_yaw, trajectory.init_pitch, trajectory.init_roll;
-
-                Eigen::Quaterniond q = dh::geometry::ypr_to_quat(ypr);
+                // quaternion s.t. vn = q*vb
+                Eigen::Quaterniond q = dh::geometry::ypr_to_quat(ypr, this->euler_angle_type);
 
                 Eigen::Vector3d pos;
                 pos << trajectory.init_px, trajectory.init_py, trajectory.init_pz;
 
-                Eigen::Vector3d vb, vn, vb0, vn0;
+                // velocity projection in body frame.
+                Eigen::Vector3d vb;
+                // velocity projection in navigtation(reference) frame.
+                Eigen::Vector3d vn;
+                // initial value of vn.
+                Eigen::Vector3d vn0;
                 vb << trajectory.init_vx, trajectory.init_vy, trajectory.init_vz;
                 vn = q * vb;
-                vb0 = vb;
                 vn0 = vn0;
 
-                // white initial navigation parameters.
-                this->write_line(*data, time_stamp, q, pos, vn);
+                // write down initial navigation parameters.
+                this->write_line(data, time_stamp, q, pos, vn);
 
-                int col = trajectory.motion_list_col;
+                // using a shorter denotion
+                const int col = trajectory.motion_list_col;
 
                 for (int k = 0; k < trajectory.motion_list_row; k++)
                 {
-                    time_stamp += this->step_time;
+                    // time_stamp += this->step_time;
                     while (time_stamp >= trajectory.motion_list[k * col + 1] && time_stamp < trajectory.motion_list[k * col + 2])
                     {
+                        // update time stamp.
+                        time_stamp = this->step_time * epoch;
+                        epoch++;
+
                         // read motion information.
-                        dwy = trajectory.motion_list[k * col + 3] * this->step_time;
-                        dwp = trajectory.motion_list[k * col + 4] * this->step_time;
-                        dwr = trajectory.motion_list[k * col + 5] * this->step_time;
+                        dyaw = trajectory.motion_list[k * col + 3] * this->step_time;
+                        dpitch = trajectory.motion_list[k * col + 4] * this->step_time;
+                        droll = trajectory.motion_list[k * col + 5] * this->step_time;
                         dvx = trajectory.motion_list[k * col + 6] * this->step_time;
                         dvy = trajectory.motion_list[k * col + 7] * this->step_time;
                         dvz = trajectory.motion_list[k * col + 8] * this->step_time;
 
                         // because euler angle was used in Trajectory to indicate attitude change, so directly using euler angle update is more convenient.
-                        ypr(0) += dwy;
-                        ypr(1) += dwp;
-                        ypr(2) += dwr;
-                        q = dh::geometry::ypr_to_quat(ypr);
+                        ypr(0) += dyaw;
+                        ypr(1) += dpitch;
+                        ypr(2) += droll;
+                        q = dh::geometry::ypr_to_quat(ypr, this->euler_angle_type);
 
                         // update velocity in body frame.
                         vb(0) += dvx;
@@ -186,18 +196,14 @@ namespace dh
                         // new pos
                         pos = (vn + vn0) / 2 * this->step_time + pos;
 
-                        // update velocity in last loop.
-                        vb0 = vb;
+                        // update initial value in last loop.
                         vn0 = vn;
 
                         // record data.
-                        this->write_line(*data, time_stamp, q, pos, vn);
-
-                        // update time stamp.
-                        time_stamp += this->step_time;
+                        this->write_line(data, time_stamp, q, pos, vn);
                     }
                 }
-                return *data;
+                return epoch;
             }
 
         private:

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-20 19:06:51
- * @LastEditTime: 2021-08-21 16:05:44
+ * @LastEditTime: 2021-08-24 14:47:03
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/enum.hpp
@@ -59,9 +59,19 @@ namespace dh
             ACCELERATION_IN_UP
         };
 
-        enum TrajectoryFormat
+        enum PositionSystem
         {
-            FORMAT_0
+            LLA,
+            ECEF,
+            XYZ
+        };
+
+        enum ReferenceFrame
+        {
+            EAST_NORTH_UP,
+            NORTH_EAST_DOWN,
+            EARTH_CERTER_EARTH_FIXED,
+            ORTHOGONAL_XYZ
         };
     }
 }
