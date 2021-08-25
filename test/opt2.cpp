@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-16 14:16:30
- * @LastEditTime: 2021-08-16 19:43:58
+ * @LastEditTime: 2021-08-25 15:18:28
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/opt2.cpp
@@ -20,7 +20,7 @@ struct NormalResidual
     template <typename T>
     bool operator()(const T *const x_estimated, T *residual) const
     {
-        residual[0] = x_ - x_estimated;
+        residual[0] = x_ - x_estimated[0];
         return true;
     }
 
@@ -35,7 +35,7 @@ struct DistanceResidual
     template <typename T>
     bool operator()(const T *const p_start, const T *const p_end, T *residual) const
     {
-        residual[0] = distance_ - (p_end - p_start);
+        residual[0] = distance_ - (p_end[0] - p_start[0]);
         return true;
     }
 
@@ -76,26 +76,31 @@ int main(int argc, char **argv)
     }
 
     px_est = px_init;
-    std::cout << px_est[0] << std::endl;
+    std::cout << px_est[1000] << std::endl;
     std::cout << data.size() << std::endl;
 
     ceres::Problem problem;
 
-    for (int i = 0; i < time_stamp.size() - 10; i++)
+    for (int i = 0; i < 5000; i++)
     {
-        problem.AddResidualBlock(new ceres::AutoDiffCostFunction<DistanceResidual, 1, 1>(new DistanceResidual(dx[i])),
+        problem.AddResidualBlock(new ceres::AutoDiffCostFunction<DistanceResidual, 1, 1, 1>(new DistanceResidual(dx[i])),
                                  NULL,
                                  &px_est[i],
                                  &px_est[i + 1]);
 
         if (pos_flag[i])
         {
-            problem.AddResidualBlock(new ceres::AutoDiffCostFunction<NormalResidual, 1, 1>(new NormalResidual(px_est[i])),
+            problem.AddResidualBlock(new ceres::AutoDiffCostFunction<NormalResidual, 1, 1>(new NormalResidual(px_meas[i])),
                                      NULL,
-                                     &px_meas[i]);
+                                     &px_est[i]);
         }
     }
 
+    // for (std::vector<double>::iterator it = px.begin(); it != px.end(); it++)
+    //     std::cout << *it << std::endl;
+
+    // for (std::vector<double>::iterator it = dx.begin(); it != dx.end(); it++)
+    //     std::cout << *it << std::endl;
     ceres::Solver::Options option;
     ceres::Solver::Options options;
     options.linear_solver_type = ceres::DENSE_QR;

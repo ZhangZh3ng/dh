@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-21 09:23:17
- * @LastEditTime: 2021-08-24 14:35:08
+ * @LastEditTime: 2021-08-25 16:45:27
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/main2.cpp
@@ -59,7 +59,7 @@ void test_tg()
     double yaw = 90 * dh::unit::degree;
     double pitch = 0 * dh::unit::degree;
     double roll = 0 * dh::unit::degree;
-    dh::tg::Trajectory3D mt(yaw, pitch, roll, 0, 0, 0, 0, 0, 0);
+    dh::tg::Trajectory3d mt(yaw, pitch, roll, 0, 0, 0, 0, 0, 0);
     mt.add_motion(10, 0, 0, 0, 0, 5, 0);
     mt.add_motion(90, 0, 0, 0, 0, 0, 0);
     int k = 0;
@@ -76,8 +76,8 @@ void test_tg()
         else
             std::cout << " ";
     }
-    dh::tg::TrajectoryGenerator gen;
-    gen.step_time = 0.1;
+    dh::tg::Trajectory3dGenerator gen;
+    gen.step_time_ = 0.1;
     std::vector<double> data;
     gen.generate(mt, data);
     k = 0;
