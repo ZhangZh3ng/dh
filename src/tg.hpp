@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-14 10:25:36
- * @LastEditTime: 2021-08-24 14:48:01
+ * @LastEditTime: 2021-08-25 10:43:20
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/ts.hpp
@@ -23,7 +23,7 @@
 
 namespace dh
 {
-    namespace tg // tg = trajectory generator.
+    namespace tg
     {
         class Trajectory3D
         {
@@ -129,7 +129,14 @@ namespace dh
 
             dh::type::EulerAngleType euler_angle_type = dh::type::EulerAngleType::ZXY;
 
-            const double generate(const dh::tg::Trajectory3D &trajectory, std::vector<double> &data)
+            /**
+             * @brief 
+             * 
+             * @param trajectory 
+             * @param data a container to receive generated data.
+             * @return const int 
+             */
+            const int generate(const dh::tg::Trajectory3D &trajectory, std::vector<double> &data)
             {
                 // total epochs, including initial value.
                 unsigned int epoch = 1;
@@ -190,10 +197,10 @@ namespace dh
                         vb(1) += dvy;
                         vb(2) += dvz;
 
-                        // new vn;
+                        // new velocity in navigation frame;
                         vn = q * vb;
 
-                        // new pos
+                        // new position
                         pos = (vn + vn0) / 2 * this->step_time + pos;
 
                         // update initial value in last loop.

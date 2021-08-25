@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-07 10:02:48
- * @LastEditTime: 2021-08-23 10:12:53
+ * @LastEditTime: 2021-08-25 10:39:59
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/sins.hpp
@@ -12,6 +12,7 @@
 
 #include "core.hpp"
 #include "wgs84.hpp"
+#include "geometry.hpp"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <math.h>
@@ -26,7 +27,7 @@ namespace dh
          * @param lat Latitude in redian.
          * @return Eigen::Matrix<double, 2, 1> The former is north-sounth radius, the latter is east-west radius.
          */
-        inline Eigen::Matrix<double, 2, 1> earth_radii(const double lat)
+        inline Eigen::Matrix<double, 2, 1> earth_radii(const double &lat)
         {
             Eigen::Matrix<double, 2, 1> R;
             R(0) = dh::wgs84::Re * (1 - dh::wgs84::e2) / std::pow((1 - dh::wgs84::e2 * std::sin(lat) * std::sin(lat)), 1.5);
@@ -41,7 +42,7 @@ namespace dh
          * @param alt Altitude in meter.
          * @return Eigen::Matrix<double, 3, 1> 
          */
-        inline Eigen::Matrix<double, 3, 1> gravity_in_enu(const double lat, const double alt)
+        inline Eigen::Matrix<double, 3, 1> gravity_in_enu(const double &lat, const double &alt)
         {
             Eigen::Matrix<double, 3, 1> g;
             g(0) = 0;
@@ -56,7 +57,7 @@ namespace dh
          * @param lat Latitude in radian.
          * @return Eigen::Matrix<double, 3, 1> 
          */
-        inline Eigen::Matrix<double, 3, 1> wie_in_enu(const double lat)
+        inline Eigen::Matrix<double, 3, 1> wie_in_enu(const double &lat)
         {
             const double wie = dh::wgs84::wie;
             Eigen::Matrix<double, 3, 1> w_ie_n;
@@ -75,7 +76,7 @@ namespace dh
          * @param vn North velocity in m/s.
          * @return Eigen::Matrix<double, 3, 1> 
          */
-        inline Eigen::Matrix<double, 3, 1> wen_in_enu(const double lat, const double alt, const double ve, const double vn)
+        inline Eigen::Matrix<double, 3, 1> wen_in_enu(const double &lat, const double &alt, const double &ve, const double &vn)
         {
             Eigen::Matrix<double, 3, 1> w_en_n;
             Eigen::Matrix<double, 2, 1> Rmn;
@@ -95,7 +96,7 @@ namespace dh
          * @param vn North velocity in m/s.
          * @return Eigen::Matrix<double, 3, 1> 
          */
-        inline Eigen::Matrix<double, 3, 1> win_in_enu(const double lat, const double alt, const double ve, const double vn)
+        inline Eigen::Matrix<double, 3, 1> win_in_enu(const double &lat, const double &alt, const double &ve, const double &vn)
         {
             Eigen::Matrix<double, 3, 1> w_in_n;
             w_in_n = dh::sins::wie_in_enu(lat) + dh::sins::wen_in_enu(lat, alt, ve, vn);
@@ -109,7 +110,7 @@ namespace dh
          * @param alt Altitude in meter.
          * @return Eigen::Matrix<double, 3 ,3> 
          */
-        inline Eigen::Matrix<double, 3, 3> sins_Mpv_enu(const double lat, const double alt)
+        inline Eigen::Matrix<double, 3, 3> sins_Mpv_enu(const double &lat, const double &alt)
         {
             Eigen::Matrix<double, 3, 3> mat;
             Eigen::Matrix<double, 2, 1> Rmn = dh::sins::earth_radii(lat);
@@ -117,87 +118,52 @@ namespace dh
             return mat;
         }
 
-        class NavigationStateInENUFrame
-        {
-        public:
-            double latitude;                    // latitude in radian.
-            double longitude;                   // longitude in radian.
-            double altitude;                    // altitude in meter.
-            double ve;                          // east velocity in m/s.
-            double vn;                          // north velocity in m/s.
-            double vu;                          // up velocity in m/s.
-            Eigen::Quaternion<double> q_b_to_n; // quaternion from body frame to navigation frame.
-        };
-
-        /**
-         * @brief Strap-down intertial navigation update, reference frame is East-North-Up.
-         * 
-         * @param ins Navigation state.
-         * @param time_length Time interval between start and end time.
-         * @param w_ib_b Anguler rate measured by three-axis gyroscope, in rad/s.
-         * @param f_ib_b Linear acceleration measured by three-axis accelerometer, in m/s^2;
-         * @return dh::sins::InertialState& 
-         */
-        inline dh::sins::NavigationStateInENUFrame &sins_update_in_enu(dh::sins::NavigationStateInENUFrame &ins, const double time_length, const Eigen::Matrix<double, 3, 1> &w_ib_b, const Eigen::Matrix<double, 3, 1> &f_ib_b)
-        {
-            dh::sins::NavigationStateInENUFrame ins0 = ins;
-            // caculate angular incrementation.
-            Eigen::Matrix<double, 3, 1> alpha = w_ib_b * time_length;
-            Eigen::Quaterniond q_bnew_to_bold = dh::core::angle_increment_2_quat(alpha);
-            Eigen::Matrix<double, 3, 1> w_ie_n = dh::sins::wie_in_enu(ins.latitude);
-            Eigen::Matrix<double, 3, 1> w_en_n = dh::sins::wen_in_enu(ins.latitude, ins.altitude, ins.ve, ins.vn);
-            Eigen::Matrix<double, 3, 1> w_in_n = dh::sins::win_in_enu(ins.latitude, ins.altitude, ins.ve, ins.vn);
-            Eigen::Quaterniond q_nnew_to_nold = dh::core::angle_increment_2_quat(w_in_n * time_length);
-            ins.q_b_to_n = q_nnew_to_nold.conjugate() * ins.q_b_to_n * q_bnew_to_bold;
-
-            Eigen::Matrix<double, 3, 1> a_nb_n;
-            Eigen::Matrix<double, 3, 1> vel0, vel1, vel_avg;
-            vel0 << ins.ve, ins.vn, ins.vu;
-
-            a_nb_n = (ins.q_b_to_n * f_ib_b + ins0.q_b_to_n * f_ib_b) * time_length / 2 - dh::core::cross_product((2 * w_ie_n + w_en_n), vel0) * time_length + dh::sins::gravity_in_enu(ins.latitude, ins.altitude) * time_length;
-
-            vel1 = vel0 + a_nb_n * time_length;
-            vel_avg = (vel0 + vel1) / 2;
-            Eigen::Matrix<double, 3, 3> mpv = dh::sins::sins_Mpv_enu(ins.latitude, ins.altitude);
-            Eigen::Matrix<double, 3, 1> pos0, pos1;
-            pos0 << ins.latitude, ins.longitude, ins.altitude;
-            pos1 = pos0 + mpv * vel_avg * time_length;
-
-            ins.latitude = pos1(0);
-            ins.longitude = pos1(1);
-            ins.altitude = pos1(2);
-            ins.ve = vel1(0);
-            ins.vn = vel1(1);
-            ins.vu = vel1(2);
-
-            return ins;
-        }
-
-        class SINSParameter
+        class SinsInEnuReferenceFrame
         {
         public:
             // quaternion s.t. q*vb = vn.
-            Eigen::Quaterniond m_q = Eigen::Quaterniond::Identity();
+            Eigen::Quaterniond q_ = Eigen::Quaterniond::Identity();
             // coordinate of ground velocity in navigation frame.
-            Eigen::Vector3d m_vn = Eigen::Vector3d::Zero();
+            Eigen::Vector3d vn_ = Eigen::Vector3d::Zero();
             // latitude(rad), longitude(rad), altitude(m)
-            Eigen::Vector3d m_lla = Eigen::Vector3d::Zero();
+            Eigen::Vector3d lla_ = Eigen::Vector3d::Zero();
 
             // imu output time interval.
-            double m_time_length = 0.01;
+            double time_length_ = 0.01;
 
-            SINSParameter(const Eigen::Quaterniond q, const Eigen::Vector3d vn, const Eigen::Vector3d lla) : m_q(q), m_vn(vn), m_lla(lla) {}
+            SinsInEnuReferenceFrame(const Eigen::Quaterniond q, const Eigen::Vector3d vn, const Eigen::Vector3d lla, const double time_length = 0.01) : q_(q), vn_(vn), lla_(lla), time_length_(time_length) {}
 
-            void update(const Eigen::Vector3d w, const Eigen::Vector3d f)
+            /**
+             * @brief update with angular velocity and acceleration.
+             * @param w_ib_b angular velocity measured by gyroscope, unit is rad/s.
+             * @param f_ib_b acceleration measured by accelerometer, unit is m/s^2.
+             */
+            void update(const Eigen::Vector3d w_ib_b, const Eigen::Vector3d f_ib_b)
             {
-                Eigen::Quaterniond qbn0, qbtb0, qntn0;
-                qbn0 = this->m_q;
-                double lat0 = this->m_lla(0);
-                double lon0 = this->m_lla(1);
-                double alt0 = this->m_lla(2);
-                
+                const double t = this->time_length_;
+                const Eigen::Quaterniond q_b_n_0 = this->q_;
+                const Eigen::Vector3d v_eb_n_0 = this->vn_;
+                const double lat0 = this->lla_(0);
+                const double lon0 = this->lla_(1);
+                const double alt0 = this->lla_(2);
+                const Eigen::Vector3d lla0 = this->lla_;
+
                 // attitude update
-                
+                Eigen::Quaterniond q_bt_b0 = dh::geometry::rot_to_quat(w_ib_b * t);
+                Eigen::Vector3d w_in_n;
+                w_in_n << 0, 0, 0;
+                Eigen::Quaterniond q_n0_nt = dh::geometry::rot_to_quat(w_in_n * t);
+                Eigen::Quaterniond q_b_n = q_n0_nt * q_b_n_0 * q_bt_b0;
+                this->q_ = q_b_n;
+
+                // velocity update
+                Eigen::Vector3d f_ib_n = (q_b_n_0 * f_ib_b + q_b_n * f_ib_b) * t / 2;
+                Eigen::Vector3d v_eb_n = v_eb_n_0 + (f_ib_n - dh::sins::gravity_in_enu(lat0, alt0)) * t;
+                this->vn_ = v_eb_n;
+
+                // position update
+                Eigen::Vector3d lla = lla0 + dh::sins::sins_Mpv_enu(lat0, alt0) * (v_eb_n + v_eb_n_0) * t / 2;
+                this->lla_ = lla;
             }
         };
     }
