@@ -9,7 +9,7 @@
             "name": "g++ - 生成和调试活动文件",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/test_friend",
+            "program": "${workspaceFolder}/bin/t_tg",
             "args": ["${workspaceFolder}/data/traj.txt"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
