@@ -4,13 +4,15 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/include/eigen3"
+                "/usr/include/eigen3",
+                "/home/zz/桌面/optmProject/examples/slam/**",
+                "/home/zz/桌面/optmProject/**"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/clang-9",
+            "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++14",
-            "intelliSenseMode": "linux-clang-x64"
+            "intelliSenseMode": "linux-gcc-x64"
         }
     ],
     "version": 4

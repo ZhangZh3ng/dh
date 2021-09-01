@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-21 09:23:17
- * @LastEditTime: 2021-08-25 16:45:27
+ * @LastEditTime: 2021-08-28 14:22:12
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/main2.cpp
@@ -46,12 +46,12 @@ void test_utils()
 void test_eigen_quat()
 {
     Eigen::Vector3d ypr;
-    ypr<< 90 * dh::unit::degree, 0, 0;
+    ypr << 90 * dh::unit::degree, 0, 0;
     Eigen::Quaterniond q = dh::geometry::ypr_to_quat(ypr, dh::type::ZXY);
     Eigen::Vector3d v;
-    v<<0,1,0;
+    v << 0, 1, 0;
     std::cout << q.coeffs() << std::endl;
-    std::cout << q*v << std::endl;
+    std::cout << q * v << std::endl;
 }
 
 void test_tg()
@@ -60,8 +60,8 @@ void test_tg()
     double pitch = 0 * dh::unit::degree;
     double roll = 0 * dh::unit::degree;
     dh::tg::Trajectory3d mt(yaw, pitch, roll, 0, 0, 0, 0, 0, 0);
-    mt.add_motion(10, 0, 0, 0, 0, 5, 0);
-    mt.add_motion(90, 0, 0, 0, 0, 0, 0);
+    mt.addMotion(10, 0, 0, 0, 0, 5, 0);
+    mt.addMotion(90, 0, 0, 0, 0, 0, 0);
     int k = 0;
     std::cout.precision(5);
     std::cout.width(6);
@@ -76,8 +76,8 @@ void test_tg()
         else
             std::cout << " ";
     }
-    dh::tg::Trajectory3dGenerator gen;
-    gen.step_time_ = 0.1;
+    dh::tg::TrajectoryGenerator3d gen;
+    gen.step_time = 0.1;
     std::vector<double> data;
     gen.generate(mt, data);
     k = 0;
@@ -94,10 +94,34 @@ void test_tg()
     }
 }
 
+bool test_read_txt_mat(const std::string & file_name){
+    
+    std::vector<std::vector<double>> mat;
+
+    std::vector<double> v1, v2;
+    v1.push_back(1);
+    v2.push_back(2);
+    mat.push_back(v1);
+    mat.push_back(v2);
+    std::cout << mat[0][0] << std::endl;
+
+    std::vector<double> data;
+    if (dh::read::read_txt(file_name, data))
+    {
+        /* code */
+    }
+    
+   for(std::vector<double>::iterator it = data.begin(); it!=data.end(); it++)
+        std::cout << *it << std::endl;
+    
+    std::cout << "ok" << std::endl;
+    return true;
+}
+
 int main(int argc, char **argv)
 {
-    // std::string path = argv[1];
-    test_eigen_quat();
+    std::string filename = argv[1];
+    test_read_txt_mat(filename);
 
     return 0;
 }

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-16 14:16:30
- * @LastEditTime: 2021-08-25 15:18:28
+ * @LastEditTime: 2021-08-28 15:52:41
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/opt2.cpp
@@ -95,15 +95,11 @@ int main(int argc, char **argv)
                                      &px_est[i]);
         }
     }
-
-    // for (std::vector<double>::iterator it = px.begin(); it != px.end(); it++)
-    //     std::cout << *it << std::endl;
-
-    // for (std::vector<double>::iterator it = dx.begin(); it != dx.end(); it++)
-    //     std::cout << *it << std::endl;
-    ceres::Solver::Options option;
+    
     ceres::Solver::Options options;
-    options.linear_solver_type = ceres::DENSE_QR;
+    options.max_num_iterations = 200;
+    options.linear_solver_type = ceres::SPARSE_NORMAL_CHOLESKY;
+
     options.minimizer_progress_to_stdout = true;
     options.max_num_iterations = 20;
 
