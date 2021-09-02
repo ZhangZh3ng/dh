@@ -1,14 +1,14 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-07 10:02:48
- * @LastEditTime: 2021-08-25 10:39:59
+ * @LastEditTime: 2021-09-02 19:55:10
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/sins.hpp
  */
 
-#ifndef DH_SINS_H
-#define DH_SINS_H
+#ifndef DH_SINS_OLD_H
+#define DH_SINS_OLD_H
 
 #include "core.hpp"
 #include "wgs84.hpp"
