@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-07 10:02:48
- * @LastEditTime: 2021-09-02 19:55:10
+ * @LastEditTime: 2021-09-04 15:52:28
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/sins.hpp
@@ -12,7 +12,7 @@
 
 #include "core.hpp"
 #include "wgs84.hpp"
-#include "geometry.hpp"
+#include "geometry.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <math.h>
