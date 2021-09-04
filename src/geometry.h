@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-02 20:13:13
- * @LastEditTime: 2021-09-02 21:36:44
+ * @LastEditTime: 2021-09-03 20:39:36
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/geometry.h
@@ -223,6 +223,13 @@ namespace geometry{
   *                          quaternion update                               *
   ***************************************************************************/
 
+  /**
+   * @brief convert rotation to quaternion.
+   * q = |    cos(r/2)    | 
+   *     |rx/r * sin(r/2) |
+   *     |ry/r * sin(r/2) |
+   *     |rz/r * sin(r/2) |
+   */
   inline Eigen::Quaterniond rot_to_quat(const Eigen::Vector3d rot){
     double w, x, y, z;
     const double norm_rot = rot.norm();
@@ -274,6 +281,23 @@ namespace geometry{
         yaw += 2*M_PI;
       else
         yaw -= 2*M_PI;
+    }
+
+    while (pitch > M_PI_2 || pitch < -M_PI_2)
+    {
+      has_change = true;
+      if (pitch > M_PI_2)
+        pitch = M_PI - pitch;
+      else
+        pitch = M_PI + pitch;
+    }
+
+    while (roll > M_PI || roll < -M_PI)
+    {
+      if (roll > M_PI)
+        roll -= 2 * M_PI;
+      else
+        roll += 2 * M_PI;
     }
     return has_change;
   }

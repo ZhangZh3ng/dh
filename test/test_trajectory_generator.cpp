@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 20:29:24
- * @LastEditTime: 2021-09-02 21:37:35
+ * @LastEditTime: 2021-09-03 21:28:39
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/test_trajectory_generator.cpp
@@ -27,8 +27,14 @@ void test2(){
     Trajectory3d traj(0, 0, 0, 0, 0, 0, 0, 0, 0);
     double t = 0;
     traj.addMotion(Motion3d(0, 100, 0, 0, 0, 0, 1, 0));
+    traj.addMotion(Motion3d(10, 50, 1, 2, 3, 4, 5, 6));
     traj.addMotion(100, 0, 0, 0, 0, 10, 0);
+    Eigen::Vector3d w,a;
+    traj.getAngleVelocityAndAcceleration(w, a, 20);
     traj.briefReport();
+    std::cout << "w: " << w << std::endl;
+    std::cout << "a: " << a << std::endl;
+
 }
 
 void test3(){
@@ -41,15 +47,23 @@ void test3(){
 }
 
 void test4(){
-    double yaw = 2*M_PI + 0.1;
-    yaw = -0.1;
-    double pitch = 0;
-    double roll = 0;
+    const double deg = M_PI/180;
+    double yaw = 400*deg;
+    double pitch = 91*deg;
+    double roll = 190*deg;
     ypr_standerlize(yaw, pitch, roll);
-    std::cout << yaw << std::endl;
+    std::cout << "yaw:" << yaw/deg << std::endl;
+    std::cout << "pitch:" << pitch/deg << std::endl;
+    std::cout << "roll:" << roll/deg << std::endl;
+}
+
+void test5(){
+    TrajectoryGenerator tg;
+
+    std::cout << "it's ok" << std::endl;
 }
 
 int main(){
-    test4();
+    test2();
     return 0;
 }
