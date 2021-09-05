@@ -1,13 +1,16 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:57:19
- * @LastEditTime: 2021-09-04 16:19:53
+ * @LastEditTime: 2021-09-05 10:55:11
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.cpp
  */
 
 #include "trajectory_generator.h"
+#include "write.h"
+
+using namespace dh::write;
 
 namespace dh{
 namespace tg{
@@ -44,11 +47,14 @@ namespace tg{
     
     w << 0, 0, 0;
     a << 0, 0, 0;
+
+    double threshhold = 1e-8;
     for(std::vector<Motion3d>::iterator it = this->motions.begin();
         it != this->motions.end();
         it++)
     {
-      if (time_stamp >= (*it).begin_time && time_stamp < (*it).end_time)
+      if ( ((*it).begin_time - time_stamp) <  threshhold
+           && ((*it).end_time - time_stamp) > threshhold )
       {
         w(0) += (*it).wy;
         w(1) += (*it).wp;
@@ -61,29 +67,62 @@ namespace tg{
     return true;
   }
 
-  bool TrajectoryGenerator::generate(const std::string& filename,
-                                     Trajectory3d& trajectory){
+  bool TrajectoryGenerator::generateNavigationParameter(const std::string &filename,
+                                                        Trajectory3d &trajectory)
+  {
     std::fstream outfile;
     outfile.open(filename.c_str(), std::istream::out);
     if (!outfile) {
     std::cout << "Error opening the file: " << filename;
     return false;
-  }
-    
+    }
+
     double time_stamp = 0;
     Eigen::Vector3d w, a;
     NavigationParameter3d np = trajectory.init_parameter;
     np.euler_angle_type = this->euler_angle_type;
+    outfile << time_stamp << " ";
+    writeNavigationParameters(outfile, np);
 
     while(time_stamp < trajectory.total_time){
       trajectory.getAngleVelocityAndAcceleration(w, a, time_stamp);
       np.update(w, a, this->step_time);
       time_stamp += this->step_time;
-      
+      outfile << time_stamp << " ";
+      writeNavigationParameters(outfile, np);
     }
-    
-
     return true;
+  };
+
+  bool TrajectoryGenerator::generateG2o(const std::string &filename,
+                                        Trajectory3d &trajectory){
+    std::fstream outfile;
+    outfile.open(filename.c_str(), std::istream::out);
+    if (!outfile) {
+    std::cout << "Error opening the file: " << filename;
+    return false;
+    }
+
+    double time_stamp = 0;
+    Eigen::Vector3d w, a;
+    NavigationParameter3d np = trajectory.init_parameter;
+    np.euler_angle_type = this->euler_angle_type;
+
+    Pose3d pose;
+    navigation_parameter_to_g2o_pose(np, pose);
+    int pose_id = 0;
+    writeG2oPose(outfile, pose_id, pose);
+
+    while(time_stamp < trajectory.total_time){
+      trajectory.getAngleVelocityAndAcceleration(w, a, time_stamp);
+      np.update(w, a, this->step_time);
+      time_stamp += this->step_time;
+
+      navigation_parameter_to_g2o_pose(np, pose);
+      ++pose_id;
+      writeG2oPose(outfile, pose_id, pose);
+    }
+    return true;                                      
   }
 
 }   // namespace tg  

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 20:29:24
- * @LastEditTime: 2021-09-03 21:28:39
+ * @LastEditTime: 2021-09-05 10:59:29
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/test_trajectory_generator.cpp
@@ -58,12 +58,18 @@ void test4(){
 }
 
 void test5(){
+    Trajectory3d traj(0, 0, 0, 0, 0, 0, 100, 0, 0);
+    double t = 0;
+    traj.addMotion(Motion3d(0, 100, 0, 0, 0, 0, 1, 0));
+    traj.addMotion(Motion3d(10, 50, 1, 2, 3, 4, 5, 6));
+    traj.addMotion(100, 0, 0, 0, 0, 10, 0);
     TrajectoryGenerator tg;
-
+    tg.data_format = G2O;
+    tg.generate("/home/zz/桌面/cpp_project/dh/data/1.txt", traj);
     std::cout << "it's ok" << std::endl;
 }
 
 int main(){
-    test2();
+    test5();
     return 0;
 }

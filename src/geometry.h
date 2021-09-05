@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-02 20:13:13
- * @LastEditTime: 2021-09-04 16:24:36
+ * @LastEditTime: 2021-09-05 10:07:16
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/geometry.h
@@ -56,6 +56,16 @@ namespace geometry{
 
   inline Eigen::Quaterniond dcm_to_quat(const Eigen::Matrix3d dcm){
     Eigen::Quaterniond q = Eigen::Quaterniond(dcm);
+    return q;
+  }
+
+  inline Eigen::Quaterniond euler_angle_to_quat(const double r1,
+                                                const double r2,
+                                                const double r3, RotationAxis axis1,
+                                                RotationAxis axis2,
+                                                RotationAxis axis3)
+  {
+    Eigen::Quaterniond q = dcm_to_quat(euler_angle_to_dcm(r1, r2, r3, axis1, axis2, axis3));
     return q;
   }
 
@@ -272,6 +282,9 @@ namespace geometry{
     return q;
   }
 
+  /***************************************************************************
+  *                                 others                                   *
+  ***************************************************************************/
   inline bool ypr_standerlize(double &yaw, double &pitch, double &roll){
     bool has_change = false;
     while (yaw < 0 || yaw > 2*M_PI)

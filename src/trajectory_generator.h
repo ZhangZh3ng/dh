@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:53:13
- * @LastEditTime: 2021-09-04 16:25:29
+ * @LastEditTime: 2021-09-05 11:03:32
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.h
@@ -123,10 +123,32 @@ namespace tg{
     class TrajectoryGenerator{
     public:
         TrajectoryGenerator(){};
-        bool generate(const std::string& filename, Trajectory3d& trajectroy);
-                
+
+        bool generate(const std::string &filename,
+                      Trajectory3d &trajectory){
+            switch (this->data_format){
+            case G2O:
+                return this->generateG2o(filename, trajectory);
+            case NavigationParameter:
+                return this->generateNavigationParameter(filename, trajectory);
+            default:
+                return false;
+            }
+        }
+
         double step_time = 0.01;
         EulerAngleType euler_angle_type = ZXY;
+        DataFormat data_format = NavigationParameter;
+
+    private:
+        // output NavigationParameter format :
+        // 1.time_stamp 2.yaw 3.pitch 4.roll 5.vx 6.vy 7.vz 8.px 9.py 10.pz
+        bool generateNavigationParameter(const std::string &filename,
+                                         Trajectory3d &trajectory);
+        // output g2o pose format:
+        // VERTEX_SE3:QUAT pose_id px py pz qx qy qz qw
+        bool generateG2o(const std::string &filename,
+                         Trajectory3d &trajectory);
     };
     
 }   // namespace tg   

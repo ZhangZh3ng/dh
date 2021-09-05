@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:08:03
- * @LastEditTime: 2021-09-04 16:23:33
+ * @LastEditTime: 2021-09-05 09:59:33
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.h
@@ -14,10 +14,13 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include "slam/pose_graph_3d/types.h"
+
 #include "type.h"
 
 
 using namespace dh::type;
+using namespace ceres::examples;
 
 namespace dh{
 namespace parameter{
@@ -53,6 +56,8 @@ namespace parameter{
       return NavigationParameter3d(0, 0, 0, 0, 0, 0, 0, 0, 0, euler_type);
     }
 
+    static std::string name() { return "NavigationParameter3d"; }
+
     double yaw;
     double pitch;
     double roll;
@@ -64,6 +69,9 @@ namespace parameter{
     double pz;
     EulerAngleType euler_angle_type;
     };
+
+    void navigation_parameter_to_g2o_pose(const NavigationParameter3d &np,
+                                          Pose3d &pose);
 
 } // namespace parameter
 } // namespace dh

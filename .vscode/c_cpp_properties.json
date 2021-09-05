@@ -4,9 +4,9 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/include/eigen3",
-                "/home/zz/桌面/optmProject/examples/slam/**",
-                "/home/zz/桌面/optmProject/**"
+                "${workspaceFolder}/external/**",
+                "${workspaceFolder}/external/slam/pose_graph_3d/**",
+                "/usr/include/eigen3"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

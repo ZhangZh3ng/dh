@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:21:23
- * @LastEditTime: 2021-09-04 16:23:36
+ * @LastEditTime: 2021-09-05 10:11:22
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.cpp
@@ -9,6 +9,7 @@
 
 #include "parameter.h"
 #include "geometry.h"
+
 
 using namespace dh::geometry;
 
@@ -43,6 +44,16 @@ namespace parameter{
                                      const Eigen::Vector3d a,
                                      const double t){
     this->update(w(0), w(1), w(2), a(0), a(1), a(2), t);
+  }
+
+  void navigation_parameter_to_g2o_pose(const NavigationParameter3d &np,
+                                        Pose3d &pose)
+  {
+    pose.p(0) = np.px;
+    pose.p(1) = np.py;
+    pose.p(2) = np.pz;
+    pose.q = ypr_to_quat(np.yaw, np.pitch, np.roll,
+                         np.euler_angle_type);
   }
 
 } // namespace parameter
