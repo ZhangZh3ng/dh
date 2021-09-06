@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:04:02
- * @LastEditTime: 2021-09-05 10:30:29
+ * @LastEditTime: 2021-09-05 18:18:18
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/io.h
@@ -27,10 +27,13 @@ namespace write{
   bool writeNavigationParameters(std::fstream &file,
                                  const NavigationParameter3d &np);
                             
-  bool writeG2oPose(std::fstream &file,
+  bool writeG2oVertexSE3(std::fstream &file,
                     const int pose_id,
                     const Pose3d& pose);
 
+  bool writeCeresPose3d(std::fstream &file,
+                        const int pose_id,
+                        const Pose3d &pose);
 } // namespace dh
 } // namespace write
 

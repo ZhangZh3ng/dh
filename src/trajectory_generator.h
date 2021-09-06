@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:53:13
- * @LastEditTime: 2021-09-05 11:03:32
+ * @LastEditTime: 2021-09-06 16:53:35
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.h
@@ -127,28 +127,40 @@ namespace tg{
         bool generate(const std::string &filename,
                       Trajectory3d &trajectory){
             switch (this->data_format){
-            case G2O:
+            case G2O_VERTEX_SE3:
                 return this->generateG2o(filename, trajectory);
-            case NavigationParameter:
+            case DH_NavigationParameter3d:
                 return this->generateNavigationParameter(filename, trajectory);
+            case CERES_Pose3d:
+                return this->generatePose(filename, trajectory);
             default:
+                std::cout << "Unsupported data format" << std::endl;
                 return false;
             }
         }
 
+        bool generate(VectorOfNavigationParameter3d &vnp,
+                      Trajectory3d &Trajectory3d);
+
         double step_time = 0.01;
         EulerAngleType euler_angle_type = ZXY;
-        DataFormat data_format = NavigationParameter;
+        DataFormat data_format = DH_NavigationParameter3d;
 
     private:
         // output NavigationParameter format :
         // 1.time_stamp 2.yaw 3.pitch 4.roll 5.vx 6.vy 7.vz 8.px 9.py 10.pz
         bool generateNavigationParameter(const std::string &filename,
                                          Trajectory3d &trajectory);
-        // output g2o pose format:
+                                         
+        // output g2o VERTEX_SE3 format:
         // VERTEX_SE3:QUAT pose_id px py pz qx qy qz qw
         bool generateG2o(const std::string &filename,
                          Trajectory3d &trajectory);
+
+        // output ceres Pose3d format:
+        // pose_id px py pz qx qy qz qw
+        bool generatePose(const std::string &filename,
+                          Trajectory3d &trajectory);
     };
     
 }   // namespace tg   

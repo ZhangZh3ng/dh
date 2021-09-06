@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:57:19
- * @LastEditTime: 2021-09-05 10:55:11
+ * @LastEditTime: 2021-09-06 16:53:51
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.cpp
@@ -14,6 +14,10 @@ using namespace dh::write;
 
 namespace dh{
 namespace tg{
+
+  /***************************************************************************
+  *                             Trajectory3d                                 *
+  ***************************************************************************/
 
   void Trajectory3d::briefReport() {
     std::cout << std::left;
@@ -67,6 +71,10 @@ namespace tg{
     return true;
   }
 
+   /***************************************************************************
+  *                          TrajectoryGenerator                               *
+  ***************************************************************************/
+
   bool TrajectoryGenerator::generateNavigationParameter(const std::string &filename,
                                                         Trajectory3d &trajectory)
   {
@@ -111,7 +119,7 @@ namespace tg{
     Pose3d pose;
     navigation_parameter_to_g2o_pose(np, pose);
     int pose_id = 0;
-    writeG2oPose(outfile, pose_id, pose);
+    writeG2oVertexSE3(outfile, pose_id, pose);
 
     while(time_stamp < trajectory.total_time){
       trajectory.getAngleVelocityAndAcceleration(w, a, time_stamp);
@@ -120,9 +128,49 @@ namespace tg{
 
       navigation_parameter_to_g2o_pose(np, pose);
       ++pose_id;
-      writeG2oPose(outfile, pose_id, pose);
+      writeG2oVertexSE3(outfile, pose_id, pose);
     }
     return true;                                      
+  }
+
+  bool TrajectoryGenerator::generatePose(const std::string &filename,
+                                         Trajectory3d &trajectory)
+  {
+    std::fstream outfile;
+    outfile.open(filename.c_str(), std::istream::out);
+    if (!outfile) {
+    std::cout << "Error opening the file: " << filename;
+    return false;
+    }
+
+    double time_stamp = 0;
+    Eigen::Vector3d w, a;
+    NavigationParameter3d np = trajectory.init_parameter;
+    np.euler_angle_type = this->euler_angle_type;
+
+    Pose3d pose;
+    navigation_parameter_to_g2o_pose(np, pose);
+    int pose_id = 0;
+    writeCeresPose3d(outfile, pose_id, pose);
+
+    while(time_stamp < trajectory.total_time){
+      trajectory.getAngleVelocityAndAcceleration(w, a, time_stamp);
+      np.update(w, a, this->step_time);
+      time_stamp += this->step_time;
+
+      navigation_parameter_to_g2o_pose(np, pose);
+      ++pose_id;
+      writeCeresPose3d(outfile, pose_id, pose);
+    }
+    return true;
+  }
+
+  bool TrajectoryGenerator::generate(VectorOfNavigationParameter3d &vnp,
+                                     Trajectory3d &Trajectory3d)
+  {
+    vnp.clear();
+    
+    return true;
   }
 
 }   // namespace tg  

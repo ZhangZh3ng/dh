@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 16:30:41
- * @LastEditTime: 2021-09-05 10:38:45
+ * @LastEditTime: 2021-09-06 16:18:30
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/write.cpp
@@ -21,14 +21,26 @@ namespace write{
     return true;
   }
 
-  bool writeG2oPose(std::fstream &file,
-                    const int pose_id,
-                    const Pose3d& pose){
+  bool writeG2oVertexSE3(std::fstream &file,
+                         const int pose_id,
+                         const Pose3d &pose)
+  {
     file << Pose3d::name() << " " << pose_id << " " << pose.p.x()
          << " " << pose.p.y() << " " << pose.p.z() << " " << pose.q.x()
          << " " << pose.q.y() << " " << pose.q.z() << " " << pose.q.w()
          << std::endl;
     return true;
   }
+
+  bool writeCeresPose3d(std::fstream &file,
+                        const int pose_id,
+                        const Pose3d &pose){
+    file << pose_id << " " << pose.p.x()
+         << " " << pose.p.y() << " " << pose.p.z() << " " << pose.q.x()
+         << " " << pose.q.y() << " " << pose.q.z() << " " << pose.q.w()
+         << std::endl;
+    return true;
+  }
+  
 } // namespace dh
 } // namespace write

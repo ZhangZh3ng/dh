@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-02 19:47:19
- * @LastEditTime: 2021-09-05 10:18:26
+ * @LastEditTime: 2021-09-05 18:13:21
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/type.h
@@ -19,8 +19,9 @@ namespace type{
 
   enum DataFormat
   {
-    G2O,
-    NavigationParameter
+    G2O_VERTEX_SE3,
+    CERES_Pose3d,
+    DH_NavigationParameter3d
   };
 
 } // namespace type
