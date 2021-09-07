@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 16:30:41
- * @LastEditTime: 2021-09-06 16:18:30
+ * @LastEditTime: 2021-09-06 19:24:30
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/write.cpp
@@ -15,7 +15,8 @@ namespace dh{
 namespace write{
   bool writeNavigationParameters(std::fstream &file,
                                  const NavigationParameter3d &np){
-    file << np.yaw << " " << np.pitch << " " << np.roll << " "
+    file << np.time_stamp << " "
+         << np.yaw << " " << np.pitch << " " << np.roll << " "
          << np.vx << " " << np.vy << " " << np.vz << " "
          << np.px << " " << np.py << " " << np.pz << std::endl;
     return true;

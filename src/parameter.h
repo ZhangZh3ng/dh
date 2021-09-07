@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:08:03
- * @LastEditTime: 2021-09-06 16:35:53
+ * @LastEditTime: 2021-09-07 20:05:43
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.h
@@ -54,22 +54,18 @@ namespace parameter{
           vx(vxyz(0)), vy(vxyz(1)), vz(vxyz(2)),
           px(pxyz(0)), py(pxyz(1)), pz(pxyz(2)),
           euler_angle_type(euler_type) {}
-
-    void update(const double wy, const double wp, const double wr,
+    
+    virtual void update(const double wy, const double wp, const double wr,
                 const double ax, const double ay, const double az,
-                const double t);
-
-    void update(const Eigen::Vector3d w,
+                const double t) = 0;
+                
+    virtual void update(const Eigen::Vector3d w,
                 const Eigen::Vector3d a,
-                const double t);
+                const double t) = 0;
 
-    static const NavigationParameter3d zeroParameter(const EulerAngleType euler_type = ZXY)
-    {
-      return NavigationParameter3d(0, 0, 0, 0, 0, 0, 0, 0, 0, euler_type);
-    }
+    virtual std::string name() = 0;
 
-    static std::string name() { return "NavigationParameter3d"; }
-
+    double time_stamp = 0;
     double yaw;
     double pitch;
     double roll;
@@ -82,10 +78,49 @@ namespace parameter{
     EulerAngleType euler_angle_type;
   };
 
+  inline std::ostream &operator<<(std::ostream &os, const NavigationParameter3d& np){
+    os << np.time_stamp
+       << " " << np.yaw << " " << np.pitch << " " << np.roll
+       << " " << np.vx << " " << np.vy << " " << np.vz
+       << " " << np.px << " " << np.py << " " << np.pz;
+    return os;
+  }
+
   typedef std::vector<NavigationParameter3d> VectorOfNavigationParameter3d;
 
-  void navigation_parameter_to_g2o_pose(const NavigationParameter3d &np,
-                                        Pose3d &pose);
+  void np_to_pose(const NavigationParameter3d &np,
+                  Pose3d &pose);
+
+
+  struct XyzNavigationParameter : public NavigationParameter3d
+  {
+  public:
+
+    void update(const double wy, const double wp, const double wr,
+                const double ax, const double ay, const double az,
+                const double t);
+
+    void update(const Eigen::Vector3d w,
+                const Eigen::Vector3d a,
+                const double t);
+
+    std::string name() { return "NP_XYZ"; }
+  };
+
+  struct EnuNavigationParameter : public NavigationParameter3d
+  {
+  public:
+  
+    void update(const double wy, const double wp, const double wr,
+                const double ax, const double ay, const double az,
+                const double t);
+
+    void update(const Eigen::Vector3d w,
+                const Eigen::Vector3d a,
+                const double t);
+
+    std::string name() { return "NP_ENU"; }
+  };
 
   /***************************************************************************
   *                             ImuMeasurement6d                             *

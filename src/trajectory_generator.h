@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:53:13
- * @LastEditTime: 2021-09-06 16:53:35
+ * @LastEditTime: 2021-09-07 20:46:05
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.h
@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -41,7 +42,6 @@ namespace tg{
               wy(val_wy), wp(val_wp), wr(val_wr),
               ax(val_ax), ay(val_ay), az(val_az) {}
 
-        static std::string name() { return "Motion3d"; }
         static int size() { return 8; }
         double getEndTime() const {return this->end_time; }
 
@@ -56,7 +56,7 @@ namespace tg{
         double az;         // acceleration in body-z axis, unit is m/s^2
     };
 
-    inline std::ostream &operator<<(std::ostream &os, Motion3d & motion) {
+    inline std::ostream &operator<<(std::ostream &os, Motion3d & motion){
         os << motion.begin_time << "\t" << motion.end_time  << "\t"
         << motion.wy << "\t" << motion.wp << "\t" << motion.wr << "\t"
         << motion.ax << "\t" << motion.ay << "\t" << motion.az;
@@ -67,30 +67,9 @@ namespace tg{
     public:
         friend class TrajectoryGenerator;
 
-        Trajectory3d(const NavigationParameter3d& np){
-            this->init_parameter = np;
+        Trajectory3d(NavigationParameter3d np){
+            this->initial_parameter = np;
         }
-
-        Trajectory3d(const double init_yaw, const double init_pitch,
-                     const double init_roll, const double init_vx,
-                     const double init_vy, const double init_vz,
-                     const double init_px, const double init_py,
-                     const double init_pz, const EulerAngleType euler_type = ZXY)
-        {
-            this->init_parameter = NavigationParameter3d(init_yaw, init_pitch,
-                                                         init_roll, init_vx,
-                                                         init_vy, init_vz,
-                                                         init_px, init_py,
-                                                         init_pz, euler_type);
-        }
-
-        Trajectory3d(const Eigen::Vector3d &ypr, const Eigen::Vector3d &vxyz,
-                     const Eigen::Vector3d &pxyz, const EulerAngleType euler_type = ZXY)
-        {
-            this->init_parameter = NavigationParameter3d(ypr, vxyz, pxyz, euler_type);
-        }
-
-        static std::string name() { return "Trajectory3d"; }
 
         void addMotion(const Motion3d& motion){
             this->motions.push_back(motion);
@@ -115,14 +94,19 @@ namespace tg{
         
     private:
         std::vector<Motion3d> motions;
-        int num_motions;
+        int num_motions = 0;
         double total_time = 0;
-        NavigationParameter3d init_parameter = NavigationParameter3d::zeroParameter();
+        NavigationParameter3d initial_parameter;
     };
+
+
 
     class TrajectoryGenerator{
     public:
         TrajectoryGenerator(){};
+
+        bool generate(VectorOfNavigationParameter3d &vnp,
+                      Trajectory3d &Trajectory3d);
 
         bool generate(const std::string &filename,
                       Trajectory3d &trajectory){
@@ -138,9 +122,6 @@ namespace tg{
                 return false;
             }
         }
-
-        bool generate(VectorOfNavigationParameter3d &vnp,
-                      Trajectory3d &Trajectory3d);
 
         double step_time = 0.01;
         EulerAngleType euler_angle_type = ZXY;

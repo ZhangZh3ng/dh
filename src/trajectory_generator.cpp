@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:57:19
- * @LastEditTime: 2021-09-06 16:53:51
+ * @LastEditTime: 2021-09-07 20:35:07
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.cpp
@@ -75,6 +75,24 @@ namespace tg{
   *                          TrajectoryGenerator                               *
   ***************************************************************************/
 
+  bool TrajectoryGenerator::generate(VectorOfNavigationParameter3d &vnp,
+                                     Trajectory3d& trajectory){
+    vnp.clear();
+    Eigen::Vector3d w, a;
+
+    np = *trajectory.initial_parameter;
+
+    np.euler_angle_type = this->euler_angle_type;
+    vnp.push_back(np);
+
+    while(np.time_stamp < trajectory.total_time){
+      trajectory.getAngleVelocityAndAcceleration(w, a, np.time_stamp);
+      np.update(w, a, this->step_time);
+      vnp.push_back(np);
+    }
+    return true;
+  }
+
   bool TrajectoryGenerator::generateNavigationParameter(const std::string &filename,
                                                         Trajectory3d &trajectory)
   {
@@ -85,20 +103,14 @@ namespace tg{
     return false;
     }
 
-    double time_stamp = 0;
-    Eigen::Vector3d w, a;
-    NavigationParameter3d np = trajectory.init_parameter;
-    np.euler_angle_type = this->euler_angle_type;
-    outfile << time_stamp << " ";
-    writeNavigationParameters(outfile, np);
-
-    while(time_stamp < trajectory.total_time){
-      trajectory.getAngleVelocityAndAcceleration(w, a, time_stamp);
-      np.update(w, a, this->step_time);
-      time_stamp += this->step_time;
-      outfile << time_stamp << " ";
-      writeNavigationParameters(outfile, np);
+    VectorOfNavigationParameter3d vnp;
+    this->generate(vnp, trajectory);
+    for (std::vector<NavigationParameter3d>::iterator it = vnp.begin();
+         it != vnp.end();
+         ++it){
+      writeNavigationParameters(outfile, *it);
     }
+
     return true;
   };
 
@@ -111,25 +123,20 @@ namespace tg{
     return false;
     }
 
-    double time_stamp = 0;
-    Eigen::Vector3d w, a;
-    NavigationParameter3d np = trajectory.init_parameter;
-    np.euler_angle_type = this->euler_angle_type;
+    VectorOfNavigationParameter3d vnp;
+    this->generate(vnp, trajectory);
 
-    Pose3d pose;
-    navigation_parameter_to_g2o_pose(np, pose);
+    Pose3d pose;   
     int pose_id = 0;
-    writeG2oVertexSE3(outfile, pose_id, pose);
-
-    while(time_stamp < trajectory.total_time){
-      trajectory.getAngleVelocityAndAcceleration(w, a, time_stamp);
-      np.update(w, a, this->step_time);
-      time_stamp += this->step_time;
-
-      navigation_parameter_to_g2o_pose(np, pose);
-      ++pose_id;
+    for (std::vector<NavigationParameter3d>::iterator it = vnp.begin();
+         it != vnp.end();
+         ++it)
+    {
+      np_to_pose(*it, pose);
       writeG2oVertexSE3(outfile, pose_id, pose);
+      ++pose_id;
     }
+
     return true;                                      
   }
 
@@ -143,35 +150,22 @@ namespace tg{
     return false;
     }
 
-    double time_stamp = 0;
-    Eigen::Vector3d w, a;
-    NavigationParameter3d np = trajectory.init_parameter;
-    np.euler_angle_type = this->euler_angle_type;
+    VectorOfNavigationParameter3d vnp;
+    this->generate(vnp, trajectory);
 
-    Pose3d pose;
-    navigation_parameter_to_g2o_pose(np, pose);
+    Pose3d pose;   
     int pose_id = 0;
-    writeCeresPose3d(outfile, pose_id, pose);
-
-    while(time_stamp < trajectory.total_time){
-      trajectory.getAngleVelocityAndAcceleration(w, a, time_stamp);
-      np.update(w, a, this->step_time);
-      time_stamp += this->step_time;
-
-      navigation_parameter_to_g2o_pose(np, pose);
-      ++pose_id;
+    for (std::vector<NavigationParameter3d>::iterator it = vnp.begin();
+         it != vnp.end();
+         ++it)
+    {
+      np_to_pose(*it, pose);
       writeCeresPose3d(outfile, pose_id, pose);
+      ++pose_id;
     }
     return true;
   }
 
-  bool TrajectoryGenerator::generate(VectorOfNavigationParameter3d &vnp,
-                                     Trajectory3d &Trajectory3d)
-  {
-    vnp.clear();
-    
-    return true;
-  }
 
 }   // namespace tg  
 }   // namespace dh
