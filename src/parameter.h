@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:08:03
- * @LastEditTime: 2021-09-08 16:30:13
+ * @LastEditTime: 2021-09-08 18:05:53
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.h
@@ -42,7 +42,7 @@ namespace parameter{
                           const double v_px,
                           const double v_py,
                           const double v_pz,
-                          const EulerAngleType euler_type = ZXY)
+                          const EulerAngleType euler_type = EulerAngleType::ZXY)
         : yaw(v_yaw), pitch(v_pitch), roll(v_roll),
           vx(v_vx), vy(v_vy), vz(v_vz),
           px(v_px), py(v_py), pz(v_pz),
@@ -51,7 +51,7 @@ namespace parameter{
     NavigationParameter3d(const Eigen::Vector3d &ypr,
                           const Eigen::Vector3d &vxyz,
                           const Eigen::Vector3d &pxyz,
-                          const EulerAngleType euler_type = ZXY)
+                          const EulerAngleType euler_type = EulerAngleType::ZXY)
         : yaw(ypr(0)), pitch(ypr(1)), roll(ypr(2)),
           vx(vxyz(0)), vy(vxyz(1)), vz(vxyz(2)),
           px(pxyz(0)), py(pxyz(1)), pz(pxyz(2)),
@@ -103,7 +103,7 @@ namespace parameter{
                            const double v_px,
                            const double v_py,
                            const double v_pz,
-                           const EulerAngleType euler_type = ZXY)
+                           const EulerAngleType euler_type = EulerAngleType::ZXY)
         : NavigationParameter3d(v_yaw, v_pitch, v_roll,
                                 v_vx, v_vy, v_vz, v_px,
                                 v_py, v_pz, euler_type)
@@ -133,7 +133,7 @@ namespace parameter{
                            const double v_px,
                            const double v_py,
                            const double v_pz,
-                           const EulerAngleType euler_type = ZXY)
+                           const EulerAngleType euler_type = EulerAngleType::ZXY)
         : NavigationParameter3d(v_yaw, v_pitch, v_roll,
                                 v_vx, v_vy, v_vz, v_px,
                                 v_py, v_pz, euler_type)

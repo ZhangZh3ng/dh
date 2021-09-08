@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-02 19:47:19
- * @LastEditTime: 2021-09-05 18:13:21
+ * @LastEditTime: 2021-09-08 18:07:13
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/type.h
@@ -13,15 +13,15 @@
 namespace dh{
 namespace type{
 
-  enum EulerAngleType{ZYX, ZXY};
+  enum class EulerAngleType{ZYX, ZXY};
 
-  enum RotationAxis{X, Y, Z};
+  enum class RotationAxis{X, Y, Z};
 
-  enum DataFormat
+  enum class DataFormat
   {
     G2O_VERTEX_SE3,
     CERES_Pose3d,
-    DH_NavigationParameter3d
+    XYZ_NavigationParameter
   };
 
 } // namespace type

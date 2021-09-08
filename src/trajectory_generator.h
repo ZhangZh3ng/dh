@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:53:13
- * @LastEditTime: 2021-09-08 15:13:58
+ * @LastEditTime: 2021-09-08 18:06:19
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.h
@@ -128,7 +128,7 @@ namespace tg{
         //     switch (this->output_data_format){
         //     case G2O_VERTEX_SE3:
         //         return this->generateG2o(filename, trajectory);
-        //     case DH_NavigationParameter3d:
+        //     case XYZ_NavigationParameter:
         //         return this->generateNavigationParameter(filename, trajectory);
         //     case CERES_Pose3d:
         //         return this->generatePose(filename, trajectory);
@@ -139,8 +139,8 @@ namespace tg{
         // }
 
         double step_time = 0.01;
-        EulerAngleType euler_angle_type = ZXY;
-        DataFormat output_data_format = DH_NavigationParameter3d;
+        EulerAngleType euler_angle_type = EulerAngleType::ZXY;
+        DataFormat output_data_format = DataFormat::XYZ_NavigationParameter;
 
     private:
         // // output NavigationParameter format :

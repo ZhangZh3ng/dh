@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-02 20:13:13
- * @LastEditTime: 2021-09-05 10:07:16
+ * @LastEditTime: 2021-09-08 18:04:44
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/geometry.h
@@ -26,13 +26,13 @@ namespace geometry{
     Eigen::Matrix3d mat;
     switch (axis)
     {
-    case X:
+    case RotationAxis::X:
       mat = Eigen::AngleAxisd(r, Eigen::Vector3d::UnitX());
       break;
-    case Y:
+    case RotationAxis::Y:
       mat = Eigen::AngleAxisd(r, Eigen::Vector3d::UnitY());
       break;
-    case Z:
+    case RotationAxis::Z:
       mat = Eigen::AngleAxisd(r, Eigen::Vector3d::UnitZ());
       break;
     }
@@ -75,7 +75,10 @@ namespace geometry{
 
   Eigen::Matrix<double, 3, 3> zxy_euler_angle_to_dcm(const Eigen::Vector3d rxyz){
     Eigen::Matrix3d dcm;
-    dcm = euler_angle_to_dcm(rxyz(2), rxyz(0), rxyz(1), Z, X, Y);
+    dcm = euler_angle_to_dcm(rxyz(2), rxyz(0), rxyz(1),
+                             RotationAxis::Z, 
+                             RotationAxis::X, 
+                             RotationAxis::Y);
     return dcm;
   }
 
@@ -83,7 +86,10 @@ namespace geometry{
                                                 const double ry, 
                                                 const double rz){
     Eigen::Matrix3d dcm;
-    dcm = euler_angle_to_dcm(rz, rx, ry, Z, X, Y);
+    dcm = euler_angle_to_dcm(rz, rx, ry,
+                             RotationAxis::Z,
+                             RotationAxis::X,
+                             RotationAxis::Y);
     return dcm;
   }
 
@@ -105,7 +111,10 @@ namespace geometry{
 
   Eigen::Matrix3d zyx_euler_angle_to_dcm(const Eigen::Vector3d rxyz){
     Eigen::Matrix3d dcm;
-    dcm = euler_angle_to_dcm(rxyz(2), rxyz(1), rxyz(0), Z, Y, X);
+    dcm = euler_angle_to_dcm(rxyz(2), rxyz(1), rxyz(0),
+                             RotationAxis::Z,
+                             RotationAxis::Y,
+                             RotationAxis::X);
     return dcm;
   }
 
@@ -113,7 +122,10 @@ namespace geometry{
                                                 const double ry, 
                                                 const double rz){
     Eigen::Matrix3d dcm;
-    dcm = euler_angle_to_dcm(rz, ry, rx, Z, Y, X);
+    dcm = euler_angle_to_dcm(rz, ry, rx,
+                             RotationAxis::Z,
+                             RotationAxis::Y,
+                             RotationAxis::X);
     return dcm;
   }
 
@@ -134,13 +146,13 @@ namespace geometry{
   ***************************************************************************/
 
   inline Eigen::Vector3d dcm_to_ypr(const Eigen::Matrix3d dcm,
-                                    EulerAngleType type = ZXY){
+                                    EulerAngleType type = EulerAngleType::ZXY){
     Eigen::Vector3d ypr;
     double yaw, pitch, roll;
     double pitch_thresh_hold = 1 - 1e-6;
     switch (type)
     {
-    case ZYX:
+    case EulerAngleType::ZYX:
       if (dcm(2, 0) < pitch_thresh_hold)
       {
         pitch = -std::asin(dcm(2, 0));
@@ -154,7 +166,7 @@ namespace geometry{
         yaw = 0;
       }
       break;
-    case ZXY:
+    case EulerAngleType::ZXY:
       if (dcm(2, 1) < pitch_thresh_hold)
       {
         pitch = std::asin(dcm(2, 1));
@@ -176,20 +188,20 @@ namespace geometry{
   }
 
   inline Eigen::Vector3d quat_to_ypr(const Eigen::Quaterniond q,
-                                     EulerAngleType type = ZXY){
+                                     EulerAngleType type = EulerAngleType::ZXY){
     Eigen::Vector3d ypr = dcm_to_ypr(q.toRotationMatrix(), type);
     return ypr;
   }
 
   inline Eigen::Matrix<double, 3, 3> ypr_to_dcm(const Eigen::Vector3d ypr,
-                                                const EulerAngleType type = ZXY){
+                                                const EulerAngleType type = EulerAngleType::ZXY){
     Eigen::Matrix3d dcm;
     switch (type)
     {
-    case ZXY:
+    case EulerAngleType::ZXY:
       dcm = zxy_euler_angle_to_dcm(ypr(1), ypr(2), ypr(0));
       break;
-    case ZYX:
+    case EulerAngleType::ZYX:
       dcm = zyx_euler_angle_to_dcm(ypr(2), ypr(1), ypr(0));
     default:
       throw 1;
@@ -199,15 +211,16 @@ namespace geometry{
 
   inline Eigen::Matrix3d ypr_to_dcm(const double yaw,
                                     const double pitch,
-                                    const double roll, 
-                                    const EulerAngleType type = ZXY){
+                                    const double roll,
+                                    const EulerAngleType type = EulerAngleType::ZXY)
+  {
     Eigen::Matrix3d dcm;
     switch (type)
     {
-    case ZXY:
+    case EulerAngleType::ZXY:
       dcm = zxy_euler_angle_to_dcm(yaw, pitch, roll);
       break;
-    case ZYX:
+    case EulerAngleType::ZYX:
       dcm = zyx_euler_angle_to_dcm(yaw, pitch, roll);
     default:
       throw 1;
@@ -216,7 +229,7 @@ namespace geometry{
   }
 
   inline Eigen::Quaterniond ypr_to_quat(const Eigen::Vector3d ypr,
-                                        const EulerAngleType type = ZXY){
+                                        const EulerAngleType type = EulerAngleType::ZXY){
     Eigen::Quaterniond q = Eigen::Quaterniond(ypr_to_dcm(ypr, type));
     return q;
   }
@@ -224,7 +237,7 @@ namespace geometry{
   inline Eigen::Quaterniond ypr_to_quat(const double yaw,
                                         const double pitch,
                                         const double roll, 
-                                        const EulerAngleType type = ZXY){
+                                        const EulerAngleType type = EulerAngleType::ZXY){
     Eigen::Quaterniond q = Eigen::Quaterniond(ypr_to_dcm(yaw, pitch, roll, type));
     return q;
   }

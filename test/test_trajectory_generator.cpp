@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 20:29:24
- * @LastEditTime: 2021-09-08 17:56:30
+ * @LastEditTime: 2021-09-08 18:07:32
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/test_trajectory_generator.cpp
@@ -72,7 +72,7 @@ void test5(){
     tg.generate<XyzNavigationParameter>(vnp, np, traj);
 
     std::cout << sizeof(np) << std::endl;
-    tg.output_data_format = CERES_Pose3d;
+    tg.output_data_format = DataFormat::CERES_Pose3d;
 
 
     // for (std::vector<NavigationParameter3d>::iterator it = vnp.begin();
