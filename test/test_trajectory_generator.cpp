@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 20:29:24
- * @LastEditTime: 2021-09-07 19:30:46
+ * @LastEditTime: 2021-09-08 17:56:30
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/test_trajectory_generator.cpp
@@ -57,19 +57,23 @@ void test4(){
 }
 
 void test5(){
-    // const double deg = M_PI/180;
-    // Trajectory3d traj(XyzNavigationParameter(0, ));
-    // // double t = 0;
-    // traj.addMotion(Motion3d(0, 100, 0, 0, 0, 0, 1, 0));
-    // traj.addMotion(100, 0, 0, 0, 0, 0, 0);
-    // traj.addMotion(Motion3d(100, 110, 9*deg, 0, 0, 0, 0, 0));
-    // traj.briefReport();
-    // TrajectoryGenerator tg;
-    // tg.data_format = CERES_Pose3d;
-    // tg.generate("/home/zz/桌面/cpp_project/dh/data/2.txt", traj);
+    const double deg = M_PI/180;
+    XyzNavigationParameter np(0, 0, 0, 0, 0, 0, 0, 0, 0);
+    Trajectory3d traj;
+    // double t = 0;
+    traj.addMotion(Motion3d(0, 100, 0, 0, 0, 0, 1, 0));
+    traj.addMotion(100, 0, 0, 0, 0, 0, 0);
+    traj.addMotion(Motion3d(100, 110, 9*deg, 0, 0, 0, 0, 0));
+    traj.briefReport();
 
-    // VectorOfNavigationParameter3d vnp;
-    // tg.generate(vnp, traj);
+    std::vector<XyzNavigationParameter> vnp;
+    TrajectoryGenerator tg;
+    
+    tg.generate<XyzNavigationParameter>(vnp, np, traj);
+
+    std::cout << sizeof(np) << std::endl;
+    tg.output_data_format = CERES_Pose3d;
+
 
     // for (std::vector<NavigationParameter3d>::iterator it = vnp.begin();
     //      it != vnp.end();

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:57:19
- * @LastEditTime: 2021-09-07 20:35:07
+ * @LastEditTime: 2021-09-08 15:12:28
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.cpp
@@ -74,97 +74,97 @@ namespace tg{
    /***************************************************************************
   *                          TrajectoryGenerator                               *
   ***************************************************************************/
+  // template <class NpType>
+  // bool TrajectoryGenerator::generate(std::vector<NpType> &vnp,
+  //                                    NpType &np,
+  //                                    Trajectory3d &trajectory)
+  // {
+  //   vnp.clear();
+  //   Eigen::Vector3d w, a;
 
-  bool TrajectoryGenerator::generate(VectorOfNavigationParameter3d &vnp,
-                                     Trajectory3d& trajectory){
-    vnp.clear();
-    Eigen::Vector3d w, a;
+  //   np.euler_angle_type = this->euler_angle_type;
+  //   vnp.push_back(np);
 
-    np = *trajectory.initial_parameter;
+  //   while(np.time_stamp < trajectory.total_time){
+  //     trajectory.getAngleVelocityAndAcceleration(w, a, np.time_stamp);
+  //     np.update(w, a, this->step_time);
+  //     vnp.push_back(np);
+  //   }
+  //   return true;
+  // }
 
-    np.euler_angle_type = this->euler_angle_type;
-    vnp.push_back(np);
+  // bool TrajectoryGenerator::generateNavigationParameter(const std::string &filename,
+  //                                                       Trajectory3d &trajectory)
+  // {
+  //   std::fstream outfile;
+  //   outfile.open(filename.c_str(), std::istream::out);
+  //   if (!outfile) {
+  //   std::cout << "Error opening the file: " << filename;
+  //   return false;
+  //   }
 
-    while(np.time_stamp < trajectory.total_time){
-      trajectory.getAngleVelocityAndAcceleration(w, a, np.time_stamp);
-      np.update(w, a, this->step_time);
-      vnp.push_back(np);
-    }
-    return true;
-  }
+  //   VectorOfNavigationParameter3d vnp;
+  //   this->generate(vnp, trajectory);
+  //   for (std::vector<NavigationParameter3d>::iterator it = vnp.begin();
+  //        it != vnp.end();
+  //        ++it){
+  //     writeNavigationParameters(outfile, *it);
+  //   }
 
-  bool TrajectoryGenerator::generateNavigationParameter(const std::string &filename,
-                                                        Trajectory3d &trajectory)
-  {
-    std::fstream outfile;
-    outfile.open(filename.c_str(), std::istream::out);
-    if (!outfile) {
-    std::cout << "Error opening the file: " << filename;
-    return false;
-    }
+  //   return true;
+  // };
 
-    VectorOfNavigationParameter3d vnp;
-    this->generate(vnp, trajectory);
-    for (std::vector<NavigationParameter3d>::iterator it = vnp.begin();
-         it != vnp.end();
-         ++it){
-      writeNavigationParameters(outfile, *it);
-    }
+  // bool TrajectoryGenerator::generateG2o(const std::string &filename,
+  //                                       Trajectory3d &trajectory){
+  //   std::fstream outfile;
+  //   outfile.open(filename.c_str(), std::istream::out);
+  //   if (!outfile) {
+  //   std::cout << "Error opening the file: " << filename;
+  //   return false;
+  //   }
 
-    return true;
-  };
+  //   VectorOfNavigationParameter3d vnp;
+  //   this->generate(vnp, trajectory);
 
-  bool TrajectoryGenerator::generateG2o(const std::string &filename,
-                                        Trajectory3d &trajectory){
-    std::fstream outfile;
-    outfile.open(filename.c_str(), std::istream::out);
-    if (!outfile) {
-    std::cout << "Error opening the file: " << filename;
-    return false;
-    }
+  //   Pose3d pose;   
+  //   int pose_id = 0;
+  //   for (std::vector<NavigationParameter3d>::iterator it = vnp.begin();
+  //        it != vnp.end();
+  //        ++it)
+  //   {
+  //     np_to_pose(*it, pose);
+  //     writeG2oVertexSE3(outfile, pose_id, pose);
+  //     ++pose_id;
+  //   }
 
-    VectorOfNavigationParameter3d vnp;
-    this->generate(vnp, trajectory);
+  //   return true;                                      
+  // }
 
-    Pose3d pose;   
-    int pose_id = 0;
-    for (std::vector<NavigationParameter3d>::iterator it = vnp.begin();
-         it != vnp.end();
-         ++it)
-    {
-      np_to_pose(*it, pose);
-      writeG2oVertexSE3(outfile, pose_id, pose);
-      ++pose_id;
-    }
+  // bool TrajectoryGenerator::generatePose(const std::string &filename,
+  //                                        Trajectory3d &trajectory)
+  // {
+  //   std::fstream outfile;
+  //   outfile.open(filename.c_str(), std::istream::out);
+  //   if (!outfile) {
+  //   std::cout << "Error opening the file: " << filename;
+  //   return false;
+  //   }
 
-    return true;                                      
-  }
+  //   VectorOfNavigationParameter3d vnp;
+  //   this->generate(vnp, trajectory);
 
-  bool TrajectoryGenerator::generatePose(const std::string &filename,
-                                         Trajectory3d &trajectory)
-  {
-    std::fstream outfile;
-    outfile.open(filename.c_str(), std::istream::out);
-    if (!outfile) {
-    std::cout << "Error opening the file: " << filename;
-    return false;
-    }
-
-    VectorOfNavigationParameter3d vnp;
-    this->generate(vnp, trajectory);
-
-    Pose3d pose;   
-    int pose_id = 0;
-    for (std::vector<NavigationParameter3d>::iterator it = vnp.begin();
-         it != vnp.end();
-         ++it)
-    {
-      np_to_pose(*it, pose);
-      writeCeresPose3d(outfile, pose_id, pose);
-      ++pose_id;
-    }
-    return true;
-  }
+  //   Pose3d pose;   
+  //   int pose_id = 0;
+  //   for (std::vector<NavigationParameter3d>::iterator it = vnp.begin();
+  //        it != vnp.end();
+  //        ++it)
+  //   {
+  //     np_to_pose(*it, pose);
+  //     writeCeresPose3d(outfile, pose_id, pose);
+  //     ++pose_id;
+  //   }
+  //   return true;
+  // }
 
 
 }   // namespace tg  

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:08:03
- * @LastEditTime: 2021-09-07 20:05:43
+ * @LastEditTime: 2021-09-08 16:30:13
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.h
@@ -10,6 +10,8 @@
 
 #ifndef DH_PARAMETER_H
 #define DH_PARAMETER_H
+
+#include<memory>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -86,15 +88,27 @@ namespace parameter{
     return os;
   }
 
-  typedef std::vector<NavigationParameter3d> VectorOfNavigationParameter3d;
-
   void np_to_pose(const NavigationParameter3d &np,
                   Pose3d &pose);
-
 
   struct XyzNavigationParameter : public NavigationParameter3d
   {
   public:
+    XyzNavigationParameter(const double v_yaw,
+                           const double v_pitch,
+                           const double v_roll,
+                           const double v_vx,
+                           const double v_vy,
+                           const double v_vz,
+                           const double v_px,
+                           const double v_py,
+                           const double v_pz,
+                           const EulerAngleType euler_type = ZXY)
+        : NavigationParameter3d(v_yaw, v_pitch, v_roll,
+                                v_vx, v_vy, v_vz, v_px,
+                                v_py, v_pz, euler_type)
+    {
+    }
 
     void update(const double wy, const double wp, const double wr,
                 const double ax, const double ay, const double az,
@@ -110,6 +124,21 @@ namespace parameter{
   struct EnuNavigationParameter : public NavigationParameter3d
   {
   public:
+    EnuNavigationParameter(const double v_yaw,
+                           const double v_pitch,
+                           const double v_roll,
+                           const double v_vx,
+                           const double v_vy,
+                           const double v_vz,
+                           const double v_px,
+                           const double v_py,
+                           const double v_pz,
+                           const EulerAngleType euler_type = ZXY)
+        : NavigationParameter3d(v_yaw, v_pitch, v_roll,
+                                v_vx, v_vy, v_vz, v_px,
+                                v_py, v_pz, euler_type)
+    {
+    }
   
     void update(const double wy, const double wp, const double wr,
                 const double ax, const double ay, const double az,

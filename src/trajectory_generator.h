@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:53:13
- * @LastEditTime: 2021-09-07 20:46:05
+ * @LastEditTime: 2021-09-08 15:13:58
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.h
@@ -67,9 +67,9 @@ namespace tg{
     public:
         friend class TrajectoryGenerator;
 
-        Trajectory3d(NavigationParameter3d np){
-            this->initial_parameter = np;
-        }
+        // Trajectory3d(NavigationParameter3d np){
+        //     this->initial_parameter = np;
+        // }
 
         void addMotion(const Motion3d& motion){
             this->motions.push_back(motion);
@@ -96,52 +96,67 @@ namespace tg{
         std::vector<Motion3d> motions;
         int num_motions = 0;
         double total_time = 0;
-        NavigationParameter3d initial_parameter;
+        // NavigationParameter3d initial_parameter;
     };
-
-
 
     class TrajectoryGenerator{
     public:
         TrajectoryGenerator(){};
 
-        bool generate(VectorOfNavigationParameter3d &vnp,
-                      Trajectory3d &Trajectory3d);
+        template <class NpType>
+        bool generate(std::vector<NpType> &vnp,
+                      NpType &np,
+                      Trajectory3d & trajectory)
+        {
+            vnp.clear();
+            Eigen::Vector3d w, a;
 
-        bool generate(const std::string &filename,
-                      Trajectory3d &trajectory){
-            switch (this->data_format){
-            case G2O_VERTEX_SE3:
-                return this->generateG2o(filename, trajectory);
-            case DH_NavigationParameter3d:
-                return this->generateNavigationParameter(filename, trajectory);
-            case CERES_Pose3d:
-                return this->generatePose(filename, trajectory);
-            default:
-                std::cout << "Unsupported data format" << std::endl;
-                return false;
+            np.euler_angle_type = this->euler_angle_type;
+            vnp.push_back(np);
+
+            while (np.time_stamp < trajectory.total_time)
+            {
+                trajectory.getAngleVelocityAndAcceleration(w, a, np.time_stamp);
+                np.update(w, a, this->step_time);
+                vnp.push_back(np);
             }
+            return true;
         }
+
+        // bool output(const std::string &filename,
+        //             Trajectory3d &trajectory){
+        //     switch (this->output_data_format){
+        //     case G2O_VERTEX_SE3:
+        //         return this->generateG2o(filename, trajectory);
+        //     case DH_NavigationParameter3d:
+        //         return this->generateNavigationParameter(filename, trajectory);
+        //     case CERES_Pose3d:
+        //         return this->generatePose(filename, trajectory);
+        //     default:
+        //         std::cout << "Unsupported data format" << std::endl;
+        //         return false;
+        //     }
+        // }
 
         double step_time = 0.01;
         EulerAngleType euler_angle_type = ZXY;
-        DataFormat data_format = DH_NavigationParameter3d;
+        DataFormat output_data_format = DH_NavigationParameter3d;
 
     private:
-        // output NavigationParameter format :
-        // 1.time_stamp 2.yaw 3.pitch 4.roll 5.vx 6.vy 7.vz 8.px 9.py 10.pz
-        bool generateNavigationParameter(const std::string &filename,
-                                         Trajectory3d &trajectory);
+        // // output NavigationParameter format :
+        // // 1.time_stamp 2.yaw 3.pitch 4.roll 5.vx 6.vy 7.vz 8.px 9.py 10.pz
+        // bool generateNavigationParameter(const std::string &filename,
+        //                                  Trajectory3d &trajectory);
                                          
-        // output g2o VERTEX_SE3 format:
-        // VERTEX_SE3:QUAT pose_id px py pz qx qy qz qw
-        bool generateG2o(const std::string &filename,
-                         Trajectory3d &trajectory);
+        // // output g2o VERTEX_SE3 format:
+        // // VERTEX_SE3:QUAT pose_id px py pz qx qy qz qw
+        // bool generateG2o(const std::string &filename,
+        //                  Trajectory3d &trajectory);
 
-        // output ceres Pose3d format:
-        // pose_id px py pz qx qy qz qw
-        bool generatePose(const std::string &filename,
-                          Trajectory3d &trajectory);
+        // // output ceres Pose3d format:
+        // // pose_id px py pz qx qy qz qw
+        // bool generatePose(const std::string &filename,
+        //                   Trajectory3d &trajectory);
     };
     
 }   // namespace tg   
