@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:53:13
- * @LastEditTime: 2021-09-10 11:02:22
+ * @LastEditTime: 2021-09-10 14:46:25
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.h
@@ -44,8 +44,7 @@ namespace tg{
 
       static int size() { return 8; }
       double getEndTime() const { return this->end_time; }
-
-  private:
+      
       double begin_time; // begin time of this motion
       double end_time;   // end time of this motion
       double wy;         // yaw velocity, unit is rad/s
@@ -71,10 +70,6 @@ namespace tg{
 
       template <class NpType>
       friend bool generateTrajectory(std::vector<NpType> &vnp, const NpType &initial_np, const Trajectory3d &trajectory, const double& dt);
-
-      // Trajectory3d(NavigationParameter3d np){
-      //     this->initial_parameter = np;
-      // }
 
       void addMotion(const Motion3d &motion)
       {
@@ -169,25 +164,7 @@ namespace tg{
     double step_time = 0.01;
     EulerAngleType euler_angle_type = EulerAngleType::ZXY;
     DataFormat output_data_format = DataFormat::XYZ_NavigationParameter;
-
-  private:
-    // // output NavigationParameter format :
-    // // 1.time_stamp 2.yaw 3.pitch 4.roll 5.vx 6.vy 7.vz 8.px 9.py 10.pz
-    // bool generateNavigationParameter(const std::string &filename,
-    //                                  Trajectory3d &trajectory);
-
-    // // output g2o VERTEX_SE3 format:
-    // // VERTEX_SE3:QUAT pose_id px py pz qx qy qz qw
-    // bool generateG2o(const std::string &filename,
-    //                  Trajectory3d &trajectory);
-
-    // // output ceres Pose3d format:
-    // // pose_id px py pz qx qy qz qw
-    // bool generatePose(const std::string &filename,
-    //                   Trajectory3d &trajectory);
   };
-
- 
 
 }   // namespace tg   
 }   // namespace dh

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:08:03
- * @LastEditTime: 2021-09-10 14:29:33
+ * @LastEditTime: 2021-09-10 15:15:20
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.h
@@ -19,10 +19,10 @@
 #include "slam/pose_graph_3d/types.h"
 
 #include "type.h"
+// #include "geometry.h"
 
-
-using namespace dh::type;
 using namespace ceres::examples;
+using namespace dh::type;
 
 namespace dh{
 namespace parameter{
@@ -42,30 +42,32 @@ namespace parameter{
                           const double v_px,
                           const double v_py,
                           const double v_pz,
+                          const double v_time_stamp = 0,
                           const EulerAngleType euler_type = EulerAngleType::ZXY)
         : yaw(v_yaw), pitch(v_pitch), roll(v_roll),
           vx(v_vx), vy(v_vy), vz(v_vz),
-          px(v_px), py(v_py), pz(v_pz),
+          px(v_px), py(v_py), pz(v_pz), time_stamp(v_time_stamp),
           euler_angle_type(euler_type) {}
 
     NavigationParameter3d(const Eigen::Vector3d &ypr,
                           const Eigen::Vector3d &vxyz,
                           const Eigen::Vector3d &pxyz,
+                          const double v_time_stamp = 0,
                           const EulerAngleType euler_type = EulerAngleType::ZXY)
         : yaw(ypr(0)), pitch(ypr(1)), roll(ypr(2)),
           vx(vxyz(0)), vy(vxyz(1)), vz(vxyz(2)),
-          px(pxyz(0)), py(pxyz(1)), pz(pxyz(2)),
+          px(pxyz(0)), py(pxyz(1)), pz(pxyz(2)),time_stamp(v_time_stamp),
           euler_angle_type(euler_type) {}
-    
-    virtual void update(const double wy, const double wp, const double wr,
-                const double ax, const double ay, const double az,
-                const double t) = 0;
-                
-    virtual void update(const Eigen::Vector3d w,
-                const Eigen::Vector3d a,
-                const double t) = 0;
 
-    virtual std::string name() = 0;
+    virtual void update(const double &wy, const double &wp, const double &wr,
+                        const double &ax, const double &ay, const double &az,
+                        const double &t);
+
+    virtual void update(const Eigen::Vector3d &w,
+                        const Eigen::Vector3d &a,
+                        const double &t);
+
+    virtual std::string name(){ return "Np"; }
 
     double time_stamp = 0;
     double yaw;
@@ -88,65 +90,12 @@ namespace parameter{
     return os;
   }
 
-  struct XyzNavigationParameter : public NavigationParameter3d
-  {
-  public:
-    XyzNavigationParameter(const double v_yaw,
-                           const double v_pitch,
-                           const double v_roll,
-                           const double v_vx,
-                           const double v_vy,
-                           const double v_vz,
-                           const double v_px,
-                           const double v_py,
-                           const double v_pz,
-                           const EulerAngleType euler_type = EulerAngleType::ZXY)
-        : NavigationParameter3d(v_yaw, v_pitch, v_roll,
-                                v_vx, v_vy, v_vz, v_px,
-                                v_py, v_pz, euler_type)
-    {
-    }
+  void np_to_pose(const NavigationParameter3d &np,
+                  Pose3d &pose);
 
-    void update(const double wy, const double wp, const double wr,
-                const double ax, const double ay, const double az,
-                const double t);
-
-    void update(const Eigen::Vector3d w,
-                const Eigen::Vector3d a,
-                const double t);
-
-    std::string name() { return "NP_XYZ"; }
-  };
-
-  struct EnuNavigationParameter : public NavigationParameter3d
-  {
-  public:
-    EnuNavigationParameter(const double v_yaw,
-                           const double v_pitch,
-                           const double v_roll,
-                           const double v_vx,
-                           const double v_vy,
-                           const double v_vz,
-                           const double v_px,
-                           const double v_py,
-                           const double v_pz,
-                           const EulerAngleType euler_type = EulerAngleType::ZXY)
-        : NavigationParameter3d(v_yaw, v_pitch, v_roll,
-                                v_vx, v_vy, v_vz, v_px,
-                                v_py, v_pz, euler_type)
-    {
-    }
-  
-    void update(const double wy, const double wp, const double wr,
-                const double ax, const double ay, const double az,
-                const double t);
-
-    void update(const Eigen::Vector3d w,
-                const Eigen::Vector3d a,
-                const double t);
-
-    std::string name() { return "NP_ENU"; }
-  };
+  /***************************************************************************
+  *                                 PoseQPV                                  *
+  ***************************************************************************/ 
 
   struct PoseQPV{
   public:
@@ -160,25 +109,11 @@ namespace parameter{
   };
 
   bool posePropogate(PoseQPV &pose, const Eigen::Vector3d &w, const Eigen::Vector3d &a,
-                     const double &dt)
-  {
-    const PoseQPV pose0 = pose;
-    quat_update_by_rot(pose.q, w * dt);
-    pose.v = pose0.v + pose0.q * a * dt;
-    pose.p = pose0.p + (pose.v + pose0.v) / 2 * dt;
-    return true;
-  }
+                     const double &dt);
 
-      /***************************************************************************
+  /***************************************************************************
   *                            Format conversion                             *
   ***************************************************************************/
-
-      void np_to_pose(const XyzNavigationParameter &np,
-                      Pose3d &pose);
-
-  void np_to_pose(const EnuNavigationParameter &np,
-                  Pose3d &pose);
-
   template<class NpType>
   void np_to_pose(std::vector<NpType>& vnp,
                   std::vector<Pose3d>& vpose){

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:04:02
- * @LastEditTime: 2021-09-05 18:18:18
+ * @LastEditTime: 2021-09-10 15:18:05
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/io.h
@@ -36,7 +36,5 @@ namespace write{
                         const Pose3d &pose);
 } // namespace dh
 } // namespace write
-
-
 
 #endif

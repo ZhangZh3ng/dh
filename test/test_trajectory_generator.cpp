@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 20:29:24
- * @LastEditTime: 2021-09-10 10:56:25
+ * @LastEditTime: 2021-09-10 14:41:13
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/test_trajectory_generator.cpp
@@ -23,20 +23,6 @@ void test1(){
     cout << "hello world" << endl;
 }
 
-void test2(){
-    // Trajectory3d traj(0, 0, 0, 0, 0, 0, 0, 0, 0);
-    // double t = 0;
-    // traj.addMotion(Motion3d(0, 100, 0, 0, 0, 0, 1, 0));
-    // traj.addMotion(Motion3d(10, 50, 1, 2, 3, 4, 5, 6));
-    // traj.addMotion(100, 0, 0, 0, 0, 10, 0);
-    // Eigen::Vector3d w,a;
-    // traj.getAngleVelocityAndAcceleration(w, a, 20);
-    // traj.briefReport();
-    // std::cout << "w: " << w << std::endl;
-    // std::cout << "a: " << a << std::endl;
-
-}
-
 void test3(){
     double rad = M_PI/180;
     double pitch = 1*rad;
@@ -56,61 +42,7 @@ void test4(){
     std::cout << "roll:" << roll/deg << std::endl;
 }
 
-void test5(){
-    const double deg = M_PI/180;
-    XyzNavigationParameter np(0, 0, 0, 0, 0, 0, 0, 0, 0);
-    Trajectory3d traj;
-    // double t = 0;
-    traj.addMotion(Motion3d(0, 100, 0, 0, 0, 0, 1, 0));
-    traj.addMotion(100, 0, 0, 0, 0, 0, 0);
-    traj.addMotion(Motion3d(100, 110, 9*deg, 0, 0, 0, 0, 0));
-    traj.briefReport();
-
-    std::vector<XyzNavigationParameter> vnp;
-    TrajectoryGenerator tg;
-    
-    tg.generate<XyzNavigationParameter>(vnp, np, traj);
-
-    std::cout << sizeof(np) << std::endl;
-    tg.output_data_format = DataFormat::CERES_Pose3d;
-
-
-    // for (std::vector<NavigationParameter3d>::iterator it = vnp.begin();
-    //      it != vnp.end();
-    //      ++it)
-    // {
-    //     std::cout << *it << std::endl;
-    // }
-
-    std::cout << "it's ok" << std::endl;
-}
-
-void test6(){
-    const double deg = M_PI/180;
-    XyzNavigationParameter np(0, 0, 0, 0, 0, 0, 0, 0, 0);
-    Trajectory3d traj;
-    // double t = 0;
-    traj.addMotion(Motion3d(0, 100, 0, 0, 0, 0, 1, 0));
-    traj.addMotion(100, 0, 0, 0, 0, 0, 0);
-    traj.addMotion(Motion3d(100, 110, 9*deg, 0, 0, 0, 0, 0));
-    traj.briefReport();
-
-    double dt = 0.01;
-    std::vector<XyzNavigationParameter> vnp;
-    generateTrajectory(vnp, np, traj, dt);
-
-    for (std::vector<XyzNavigationParameter>::iterator it = vnp.begin();
-         it != vnp.end();
-         ++it)
-    {
-        std::cout << *it << std::endl;
-    }
-
-    std::cout << "it's ok" << std::endl;
-}
-
 
 int main(){
-    test6();
     return 0;
 }

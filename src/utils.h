@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-21 11:07:33
- * @LastEditTime: 2021-09-06 16:20:46
+ * @LastEditTime: 2021-09-10 15:16:16
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/utils.hpp
@@ -13,8 +13,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-namespace dh
-{
+namespace dh{
 namespace utils{
     /**
     * @brief Return the anti-skew matrix corresponding to the input 3x1 vector
@@ -72,5 +71,4 @@ namespace utils{
 
 } // namespace utils
 } // namespace dh
-
-#endif
+#endif // DH_UTILS_H

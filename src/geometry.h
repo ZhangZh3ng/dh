@@ -1,14 +1,14 @@
 /*
  * @Author: your name
  * @Date: 2021-09-02 20:13:13
- * @LastEditTime: 2021-09-10 14:27:17
+ * @LastEditTime: 2021-09-10 15:19:46
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/geometry.h
  */
 
-#ifndef DH_GEOMETRY_H
-#define DH_GEOMETRY_H
+#ifndef DH_GEOMETRY_H_
+#define DH_GEOMETRY_H_
 
 #include <cmath>
 
@@ -346,4 +346,4 @@ namespace geometry{
 
 } // namespace geometry
 } // namespace dh
-#endif
+#endif // DH_GEOMETRY_H_
