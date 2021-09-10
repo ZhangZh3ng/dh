@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:57:19
- * @LastEditTime: 2021-09-08 15:12:28
+ * @LastEditTime: 2021-09-10 11:00:48
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.cpp
@@ -34,8 +34,8 @@ namespace tg{
     << "Wr\t" << "Ax\t" << "Ay\t" << "Az\t" << std::endl;
 
     int index = 1;
-    for (std::vector<Motion3d>::iterator it = this->motions.begin();
-         it != this->motions.end(); it++){
+    for (std::vector<Motion3d>::iterator it = this->motions_ptr->begin();
+         it != this->motions_ptr->end(); it++){
       std::cout << index++ << "\t";
       std::cout << *it << std::endl;
     }
@@ -45,7 +45,7 @@ namespace tg{
 
   bool Trajectory3d::getAngleVelocityAndAcceleration(Eigen::Vector3d &w,
                                                      Eigen::Vector3d &a,
-                                                     const double time_stamp){
+                                                     const double time_stamp) const {
     if(time_stamp >= this->total_time)                                                 
       return false;
     
@@ -53,8 +53,8 @@ namespace tg{
     a << 0, 0, 0;
 
     double threshhold = 1e-8;
-    for(std::vector<Motion3d>::iterator it = this->motions.begin();
-        it != this->motions.end();
+    for(std::vector<Motion3d>::iterator it = this->motions_ptr->begin();
+        it != this->motions_ptr->end();
         it++)
     {
       if ( ((*it).begin_time - time_stamp) <  threshhold

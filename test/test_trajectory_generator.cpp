@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 20:29:24
- * @LastEditTime: 2021-09-08 18:07:32
+ * @LastEditTime: 2021-09-10 10:56:25
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/test_trajectory_generator.cpp
@@ -85,7 +85,32 @@ void test5(){
     std::cout << "it's ok" << std::endl;
 }
 
+void test6(){
+    const double deg = M_PI/180;
+    XyzNavigationParameter np(0, 0, 0, 0, 0, 0, 0, 0, 0);
+    Trajectory3d traj;
+    // double t = 0;
+    traj.addMotion(Motion3d(0, 100, 0, 0, 0, 0, 1, 0));
+    traj.addMotion(100, 0, 0, 0, 0, 0, 0);
+    traj.addMotion(Motion3d(100, 110, 9*deg, 0, 0, 0, 0, 0));
+    traj.briefReport();
+
+    double dt = 0.01;
+    std::vector<XyzNavigationParameter> vnp;
+    generateTrajectory(vnp, np, traj, dt);
+
+    for (std::vector<XyzNavigationParameter>::iterator it = vnp.begin();
+         it != vnp.end();
+         ++it)
+    {
+        std::cout << *it << std::endl;
+    }
+
+    std::cout << "it's ok" << std::endl;
+}
+
+
 int main(){
-    test5();
+    test6();
     return 0;
 }

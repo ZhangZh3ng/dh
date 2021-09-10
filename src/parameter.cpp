@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:21:23
- * @LastEditTime: 2021-09-07 20:09:12
+ * @LastEditTime: 2021-09-08 18:41:41
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.cpp
@@ -15,16 +15,6 @@ using namespace dh::geometry;
 
 namespace dh{
 namespace parameter{
-
-  void np_to_pose(const NavigationParameter3d &np,
-                  Pose3d &pose)
-  {
-    pose.p(0) = np.px;
-    pose.p(1) = np.py;
-    pose.p(2) = np.pz;
-    pose.q = ypr_to_quat(np.yaw, np.pitch, np.roll,
-                         np.euler_angle_type);
-  }
 
   /***************************************************************************
   *                         XyzNavigationParameter                           *
@@ -100,6 +90,30 @@ namespace parameter{
                                       const double t)
   {
     this->update(w(0), w(1), w(2), a(0), a(1), a(2), t);
+  }
+
+  /***************************************************************************
+  *                            Format conversion                             *
+  ***************************************************************************/
+
+  void np_to_pose(const XyzNavigationParameter &np,
+                  Pose3d &pose)
+  {
+    pose.p(0) = np.px;
+    pose.p(1) = np.py;
+    pose.p(2) = np.pz;
+    pose.q = ypr_to_quat(np.yaw, np.pitch, np.roll,
+                         np.euler_angle_type);
+  }
+
+  void np_to_pose(const EnuNavigationParameter &np,
+                  Pose3d &pose)
+  {
+    pose.p(0) = np.px;
+    pose.p(1) = np.py;
+    pose.p(2) = np.pz;
+    pose.q = ypr_to_quat(np.yaw, np.pitch, np.roll,
+                         np.euler_angle_type);
   }
 
 } // namespace parameter

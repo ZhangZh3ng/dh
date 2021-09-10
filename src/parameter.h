@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:08:03
- * @LastEditTime: 2021-09-08 18:05:53
+ * @LastEditTime: 2021-09-10 14:29:33
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.h
@@ -88,9 +88,6 @@ namespace parameter{
     return os;
   }
 
-  void np_to_pose(const NavigationParameter3d &np,
-                  Pose3d &pose);
-
   struct XyzNavigationParameter : public NavigationParameter3d
   {
   public:
@@ -150,6 +147,50 @@ namespace parameter{
 
     std::string name() { return "NP_ENU"; }
   };
+
+  struct PoseQPV{
+  public:
+    PoseQPV(const Eigen::Quaterniond &v_q, const Eigen::Vector3d &v_p,
+            const Eigen::Vector3d &v_v, const double &v_time_stamp = 0) : q(v_q), p(v_p), v(v_v), time_stamp(v_time_stamp) {}
+
+    Eigen::Quaterniond q = Eigen::Quaterniond::Identity();
+    Eigen::Vector3d p = Eigen::Vector3d(0, 0, 0);
+    Eigen::Vector3d v = Eigen::Vector3d(0, 0, 0);
+    double time_stamp = 0;
+  };
+
+  bool posePropogate(PoseQPV &pose, const Eigen::Vector3d &w, const Eigen::Vector3d &a,
+                     const double &dt)
+  {
+    const PoseQPV pose0 = pose;
+    quat_update_by_rot(pose.q, w * dt);
+    pose.v = pose0.v + pose0.q * a * dt;
+    pose.p = pose0.p + (pose.v + pose0.v) / 2 * dt;
+    return true;
+  }
+
+      /***************************************************************************
+  *                            Format conversion                             *
+  ***************************************************************************/
+
+      void np_to_pose(const XyzNavigationParameter &np,
+                      Pose3d &pose);
+
+  void np_to_pose(const EnuNavigationParameter &np,
+                  Pose3d &pose);
+
+  template<class NpType>
+  void np_to_pose(std::vector<NpType>& vnp,
+                  std::vector<Pose3d>& vpose){
+    vpose.clear();
+    Pose3d pose;
+    for(typename std::vector<NpType>::iterator it = vnp.begin();
+        it != vnp.end();
+        ++it){
+      np_to_pose(*it, pose);
+      vpose.push_back(pose);
+    }               
+  }
 
   /***************************************************************************
   *                             ImuMeasurement6d                             *

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-02 20:13:13
- * @LastEditTime: 2021-09-08 18:04:44
+ * @LastEditTime: 2021-09-10 14:27:17
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/geometry.h
@@ -266,7 +266,8 @@ namespace geometry{
   }
 
   inline const Eigen::Quaterniond &quat_add_rot(Eigen::Quaterniond &q,
-                                                const Eigen::Vector3d &rot){
+                                                const Eigen::Vector3d &rot)
+  {
     const double norm_rot = rot.norm();
     const double sin_half_norm_rot = std::sin(norm_rot / 2);
     double w, x, y, z;
@@ -293,6 +294,21 @@ namespace geometry{
     Eigen::Quaterniond dq = Eigen::Quaterniond(w, x, y, z);
     q = q * dq;
     return q;
+  }
+
+  inline bool quat_update_by_rot(Eigen::Quaterniond &q,
+                                 const Eigen::Vector3d &rot)
+  {
+    const double norm_rot = rot.norm();
+    const double sin_half_norm_rot = std::sin(norm_rot / 2);
+    double w, x, y, z;
+    w = std::cos(norm_rot / 2);
+    x = rot(0) / norm_rot * sin_half_norm_rot;
+    y = rot(1) / norm_rot * sin_half_norm_rot;
+    z = rot(2) / norm_rot * sin_half_norm_rot;
+    Eigen::Quaterniond dq = Eigen::Quaterniond(w, x, y, z);
+    q = q * dq;
+    return true;
   }
 
   /***************************************************************************
