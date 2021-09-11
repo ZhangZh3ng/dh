@@ -1,14 +1,14 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:04:02
- * @LastEditTime: 2021-09-10 15:18:05
+ * @LastEditTime: 2021-09-10 16:07:58
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/io.h
  */
 
-#ifndef DH_WRITE_H
-#define DH_WRITE_H
+#ifndef DH_MYWRITE_H
+#define DH_MYWRITE_H
 
 #include <iostream>
 #include <string>

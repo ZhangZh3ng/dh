@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-07 11:29:12
- * @LastEditTime: 2021-09-06 16:24:33
+ * @LastEditTime: 2021-09-11 08:31:30
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/wgs84.hpp
@@ -19,7 +19,7 @@ namespace wgs84{
     const double Rp = 6356752;
     const double wie = 7.292115e-5;
     const double ge = 9.7803253359;
-}
-}
+} // namespace wgs84
+} // namespace dh
 
-#endif
+#endif // DH_WGS84_H

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:21:23
- * @LastEditTime: 2021-09-10 15:15:14
+ * @LastEditTime: 2021-09-10 18:15:11
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.cpp
@@ -71,6 +71,34 @@ namespace parameter{
     pose.p(2) = np.pz;
     pose.q = ypr_to_quat(np.yaw, np.pitch, np.roll,
                          np.euler_angle_type);
+  }
+
+  void pose_to_imu(const PoseQPV &p_begin, const PoseQPV &p_end,
+                   ImuMeasurement6d &imu)
+  {
+    const double dt = p_end.time_stamp - p_begin.time_stamp;
+    imu.time_stamp = p_begin.time_stamp;
+    // Qe = Qb * dq(w*dt)
+    imu.w = quat_increment_to_rot(p_begin.q, p_end.q) / dt;
+    // Ve = Vb + R(Qb)*(a*dt)
+    imu.a = p_begin.q.inverse() * (p_end.v - p_begin.v) / dt;
+  }
+
+  void pose_to_imu(const std::vector<PoseQPV> &pose,
+                   std::vector<ImuMeasurement6d> &imu)
+  {
+    imu.clear();
+    ImuMeasurement6d imu_now = ImuMeasurement6d::Zero();
+    PoseQPV p_begin, p_end;
+    for (std::vector<PoseQPV>::const_iterator it_pose = pose.begin();
+         it_pose+1 != pose.end();
+         ++it_pose)
+    {
+      p_begin = *it_pose;
+      p_end = *(it_pose+1);
+      pose_to_imu(p_begin, p_end, imu_now);
+      imu.push_back(imu_now);
+    }
   }
 
 } // namespace parameter

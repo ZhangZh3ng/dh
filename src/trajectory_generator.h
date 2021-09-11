@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:53:13
- * @LastEditTime: 2021-09-10 14:46:25
+ * @LastEditTime: 2021-09-10 19:22:06
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.h
@@ -118,53 +118,6 @@ namespace tg{
     }
     return true;
   }
-
-  class TrajectoryGenerator
-  {
-  public:
-    TrajectoryGenerator(){};
-
-    template <class NpType>
-    bool generate(std::vector<NpType> &vnp,
-                  NpType &np,
-                  Trajectory3d &trajectory)
-    {
-        vnp.clear();
-        Eigen::Vector3d w, a;
-
-        np.euler_angle_type = this->euler_angle_type;
-        vnp.push_back(np);
-
-        while (np.time_stamp < trajectory.total_time)
-        {
-            trajectory.getAngleVelocityAndAcceleration(w, a, np.time_stamp);
-            np.update(w, a, this->step_time);
-            vnp.push_back(np);
-        }
-        return true;
-    }
-
-    template<class NpType>
-    void output(const std::string &filename,
-                Trajectory3d &trajectory)
-    {
-        switch (this->output_data_format)
-        {
-        case DataFormat::G2O_VERTEX_SE3:
-            
-        case DataFormat::XYZ_NavigationParameter:
-
-        case DataFormat::CERES_Pose3d:
-
-        default:
-            std::cout << "Unsupported data format" << std::endl;
-        }
-    }
-
-    double step_time = 0.01;
-    EulerAngleType euler_angle_type = EulerAngleType::ZXY;
-    DataFormat output_data_format = DataFormat::XYZ_NavigationParameter;
-  };
 
 }   // namespace tg   
 }   // namespace dh

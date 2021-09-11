@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 20:29:24
- * @LastEditTime: 2021-09-10 14:41:13
+ * @LastEditTime: 2021-09-11 08:43:56
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/test_trajectory_generator.cpp
@@ -43,6 +43,26 @@ void test4(){
 }
 
 
+void test2(){
+    Eigen::Quaterniond q = Eigen::Quaterniond::Identity();
+    Eigen::Quaterniond q_begin = q;
+    std::cout << "origin quaternion: \n" << q.coeffs() << std::endl;
+
+    Eigen::Vector3d rot;
+    rot << 0.11, 0.2, 1.5;
+    quat_update_by_rot(q, rot);
+    std::cout << "after add rot: \n" << q.coeffs() << std::endl;
+
+    Eigen::Vector3d rot2;
+    rot2 = quat_increment_to_rot(q_begin, q);
+    std::cout << rot2 << std::endl;
+}
+
+void test5(){
+    Trajectory3d traj;
+}
+
 int main(){
+    test5();
     return 0;
 }

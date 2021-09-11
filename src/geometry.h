@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-02 20:13:13
- * @LastEditTime: 2021-09-10 15:19:46
+ * @LastEditTime: 2021-09-10 16:39:29
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/geometry.h
@@ -309,6 +309,31 @@ namespace geometry{
     Eigen::Quaterniond dq = Eigen::Quaterniond(w, x, y, z);
     q = q * dq;
     return true;
+  }
+
+  inline void quat_increment_to_rot(const Eigen::Quaterniond &q_begin,
+                                    const Eigen::Quaterniond &q_end,
+                                    Eigen::Vector3d &rot)
+  {
+    const Eigen::Quaterniond dq = q_begin.inverse() * q_end;
+    const double norm_rot = 2*acos(dq.w());
+    const double rot_sin_half_norm_rot = norm_rot / sin(norm_rot/2);
+    rot(0) = dq.x() * rot_sin_half_norm_rot;
+    rot(1) = dq.y() * rot_sin_half_norm_rot;
+    rot(2) = dq.z() * rot_sin_half_norm_rot;
+  }
+
+  inline Eigen::Vector3d quat_increment_to_rot(const Eigen::Quaterniond &q_begin,
+                                               const Eigen::Quaterniond &q_end)
+  {
+    Eigen::Vector3d rot;
+    const Eigen::Quaterniond dq = q_begin.inverse() * q_end;
+    const double norm_rot = 2*acos(dq.w());
+    const double rot_sin_half_norm_rot = norm_rot / sin(norm_rot/2);
+    rot(0) = dq.x() * rot_sin_half_norm_rot;
+    rot(1) = dq.y() * rot_sin_half_norm_rot;
+    rot(2) = dq.z() * rot_sin_half_norm_rot;
+    return rot;
   }
 
   /***************************************************************************

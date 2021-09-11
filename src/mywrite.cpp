@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 16:30:41
- * @LastEditTime: 2021-09-10 15:17:38
+ * @LastEditTime: 2021-09-10 16:06:41
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/write.cpp
@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-#include "write.h"
+#include "mywrite.h"
 
 namespace dh{
 namespace write{
