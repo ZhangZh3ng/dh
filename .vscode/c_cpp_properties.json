@@ -4,13 +4,15 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
+                "${workspaceFolder}/external/**",
+                "${workspaceFolder}/external/slam/pose_graph_3d/**",
                 "/usr/include/eigen3"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/clang-9",
+            "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++14",
-            "intelliSenseMode": "linux-clang-x64"
+            "intelliSenseMode": "linux-gcc-x64"
         }
     ],
     "version": 4
