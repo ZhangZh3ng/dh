@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-07 10:02:48
- * @LastEditTime: 2021-09-11 09:32:17
+ * @LastEditTime: 2021-09-11 16:02:56
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/sins.hpp
@@ -182,7 +182,8 @@ namespace sins{
     // latitude:
     double t0 = 0, t = 0;
     int iter_times = 0;
-    while (iter_times < 8)
+    const int MAX_ITER_TIME = 6;
+    while (iter_times < MAX_ITER_TIME)
     {
       ++iter_times;
       t = 1 / sqrt(x * x + y * y) * (z + Re * e2 * t0 / sqrt(1 + (1 - e2) * t0 * t0));
@@ -190,9 +191,8 @@ namespace sins{
     }
     lat = atan(t);
     // altitude:
-    double Rn = Re / sqrt(1 - e2 * pow(sin(x), 2));
+    double Rn = Re / sqrt(1 - e2 * pow(sin(lat), 2));
     alt = sqrt(x * x + y * y) / cos(lat) - Rn;
-
     lla << lat, lon, alt;
     return lla;
   }
@@ -206,9 +206,9 @@ namespace sins{
     const double Re = dh::wgs84::Re;
     const double e2 = dh::wgs84::e2;
     const double Rn = Re / sqrt(1 - e2 * pow(sin(lat), 2));
-    x = (Rn + alt) * cos(alt) * cos(lon);
-    y = (Rn + alt) * cos(alt) * sin(lon);
-    z = (Rn * (1 - e2) + alt * sin(alt));
+    x = (Rn + alt) * cos(lat) * cos(lon);
+    y = (Rn + alt) * cos(lat) * sin(lon);
+    z = (Rn * (1 - e2) + alt) * sin(lat);
     ecef << x, y, z;
     return ecef;
   }

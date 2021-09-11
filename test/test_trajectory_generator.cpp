@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 20:29:24
- * @LastEditTime: 2021-09-11 11:03:52
+ * @LastEditTime: 2021-09-11 15:59:20
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/test_trajectory_generator.cpp
@@ -14,12 +14,14 @@
 #include "geometry.h"
 #include "unit.h"
 #include "mywrite.h"
+#include "sins.h"
 
 using namespace std;
 using namespace dh::tg;
 using namespace dh::geometry;
 using namespace dh::unit;
 using namespace dh::write;
+using namespace dh::sins;
 
 void test1(){
     Motion3d motion(0, 10, 1, 1, 1, 2, 2 ,2);
@@ -76,11 +78,23 @@ void test5(){
     generateTrajectory<NavigationParameter3d>(vnp, np, traj, 0.01);
     writeVector<NavigationParameter3d>("/home/zz/桌面/cpp_project/dh/data/np.txt", vnp);
     std::cout << "it's ok" << std::endl;
-    
-    
+ 
+}
+
+void test6(){
+    Eigen::Vector3d lla;
+    lla << 45*degree, 120*degree, 100;
+    std::cout << lla << std::endl;
+    Eigen::Vector3d ecef;
+    ecef = lla_to_ecef(lla);
+    std::cout << ecef << std::endl;
+    lla = ecef_to_lla(ecef);
+    // lla(0) = lla(0)/degree;
+    // lla(1) = lla(1)/degree;
+    std::cout << lla << std::endl;
 }
 
 int main(){
-    test5();
+    test6();
     return 0;
 }
