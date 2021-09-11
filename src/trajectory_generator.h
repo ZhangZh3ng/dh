@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:53:13
- * @LastEditTime: 2021-09-10 19:22:06
+ * @LastEditTime: 2021-09-11 10:50:00
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.h
@@ -32,7 +32,7 @@ namespace tg{
   struct Motion3d
   {
   public:
-      friend std::ostream &operator<<(std::ostream &os, Motion3d &motion);
+      friend std::ostream &operator<<(std::ostream &os, const Motion3d &motion);
       friend class Trajectory3d;
 
       Motion3d(const double val_begin_time, const double val_end_time,
@@ -55,7 +55,7 @@ namespace tg{
       double az;         // acceleration in body-z axis, unit is m/s^2
   };
 
-  inline std::ostream &operator<<(std::ostream &os, Motion3d &motion)
+  inline std::ostream &operator<<(std::ostream &os, const Motion3d &motion)
   {
       os << motion.begin_time << "\t" << motion.end_time << "\t"
          << motion.wy << "\t" << motion.wp << "\t" << motion.wr << "\t"
@@ -66,21 +66,20 @@ namespace tg{
   class Trajectory3d
   {
   public:
-      friend class TrajectoryGenerator;
-
+      
       template <class NpType>
       friend bool generateTrajectory(std::vector<NpType> &vnp, const NpType &initial_np, const Trajectory3d &trajectory, const double& dt);
 
       void addMotion(const Motion3d &motion)
       {
-          this->motions_ptr->push_back(motion);
+          this->motions.push_back(motion);
           this->num_motions += 1;
-          if (motion.getEndTime() > this->total_time)
-              this->total_time = motion.getEndTime();
+          if (motion.end_time > this->total_time)
+              this->total_time = motion.end_time;
       }
 
-      void addMotion(const double lasting_time, const double wy, const double wp,
-                     const double wr, const double ax, const double ay, const double az)
+      void addMotion(const double& lasting_time, const double& wy, const double& wp,
+                     const double& wr, const double& ax, const double& ay, const double& az)
       {
           this->addMotion(Motion3d(this->total_time,
                                    this->total_time + lasting_time,
@@ -91,10 +90,10 @@ namespace tg{
                                            Eigen::Vector3d &a,
                                            const double time_stamp) const ;
 
-      void briefReport();
+      void briefReport() const ;
 
   private:
-      std::shared_ptr<std::vector<Motion3d>> motions_ptr;
+      std::vector<Motion3d> motions;
       int num_motions = 0;
       double total_time = 0;
       // NavigationParameter3d initial_parameter;

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 20:29:24
- * @LastEditTime: 2021-09-11 08:43:56
+ * @LastEditTime: 2021-09-11 11:03:52
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/test_trajectory_generator.cpp
@@ -12,10 +12,14 @@
 
 #include "trajectory_generator.h"
 #include "geometry.h"
+#include "unit.h"
+#include "mywrite.h"
 
 using namespace std;
 using namespace dh::tg;
 using namespace dh::geometry;
+using namespace dh::unit;
+using namespace dh::write;
 
 void test1(){
     Motion3d motion(0, 10, 1, 1, 1, 2, 2 ,2);
@@ -60,6 +64,20 @@ void test2(){
 
 void test5(){
     Trajectory3d traj;
+    NavigationParameter3d np(0, 0, 0, 0, 0, 0, 0, 0, 0);
+    traj.addMotion(Motion3d(0, 10, 0, 0, 0, 0, 1, 0));
+    traj.addMotion(10, 0, 0, 0, 0, 1, 0);
+    traj.addMotion(90, 0, 0, 0, 0, 0, 0);
+    traj.addMotion(9, 10*degree, 0, 0, 0, 0, 0);
+    traj.addMotion(100, 0, 0, 0, 0, 0, 0);
+
+    vector<NavigationParameter3d> vnp;
+
+    generateTrajectory<NavigationParameter3d>(vnp, np, traj, 0.01);
+    writeVector<NavigationParameter3d>("/home/zz/桌面/cpp_project/dh/data/np.txt", vnp);
+    std::cout << "it's ok" << std::endl;
+    
+    
 }
 
 int main(){

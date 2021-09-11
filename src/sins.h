@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-07 10:02:48
- * @LastEditTime: 2021-09-11 08:45:45
+ * @LastEditTime: 2021-09-11 09:32:17
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/sins.hpp
@@ -23,7 +23,7 @@ using namespace dh::geometry;
 
 namespace dh{
 namespace sins{
-  
+
 /**
  * @brief Return the radii of earth at latitude = lat and altitude = alt.
  * 
@@ -168,6 +168,50 @@ namespace sins{
       this->lla_ = lla;
     }
   };
+
+  inline Eigen::Vector3d ecef_to_lla(const Eigen::Vector3d& ecef){
+    Eigen::Vector3d lla;
+    const double Re = dh::wgs84::Re;
+    const double e2 = dh::wgs84::e2;
+    double x, y, z, lat, lon, alt;
+    x = ecef(0);
+    y = ecef(1);
+    z = ecef(2);
+    // longitude:
+    lon = atan2(y, x);
+    // latitude:
+    double t0 = 0, t = 0;
+    int iter_times = 0;
+    while (iter_times < 8)
+    {
+      ++iter_times;
+      t = 1 / sqrt(x * x + y * y) * (z + Re * e2 * t0 / sqrt(1 + (1 - e2) * t0 * t0));
+      t0 = t;
+    }
+    lat = atan(t);
+    // altitude:
+    double Rn = Re / sqrt(1 - e2 * pow(sin(x), 2));
+    alt = sqrt(x * x + y * y) / cos(lat) - Rn;
+
+    lla << lat, lon, alt;
+    return lla;
+  }
+
+  inline Eigen::Vector3d lla_to_ecef(const Eigen::Vector3d& lla){
+    Eigen::Vector3d ecef;
+    double lat, lon, alt, x, y, z;
+    lat = lla(0);
+    lon = lla(1);
+    alt = lla(2);
+    const double Re = dh::wgs84::Re;
+    const double e2 = dh::wgs84::e2;
+    const double Rn = Re / sqrt(1 - e2 * pow(sin(lat), 2));
+    x = (Rn + alt) * cos(alt) * cos(lon);
+    y = (Rn + alt) * cos(alt) * sin(lon);
+    z = (Rn * (1 - e2) + alt * sin(alt));
+    ecef << x, y, z;
+    return ecef;
+  }
 
 } // namespace sins
 } // namespace dh

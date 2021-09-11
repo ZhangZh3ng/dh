@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:57:19
- * @LastEditTime: 2021-09-10 19:22:38
+ * @LastEditTime: 2021-09-11 10:47:21
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.cpp
@@ -19,7 +19,7 @@ namespace tg{
   *                             Trajectory3d                                 *
   ***************************************************************************/
 
-  void Trajectory3d::briefReport() {
+  void Trajectory3d::briefReport() const {
     std::cout << std::left;
     std::cout << "********************************************" <<
     "**************************" << std::endl;
@@ -34,8 +34,9 @@ namespace tg{
     << "Wr\t" << "Ax\t" << "Ay\t" << "Az\t" << std::endl;
 
     int index = 1;
-    for (std::vector<Motion3d>::iterator it = this->motions_ptr->begin();
-         it != this->motions_ptr->end(); it++){
+    for (std::vector<Motion3d>::const_iterator it = this->motions.begin();
+         it != this->motions.end();
+         it++){
       std::cout << index++ << "\t";
       std::cout << *it << std::endl;
     }
@@ -53,8 +54,8 @@ namespace tg{
     a << 0, 0, 0;
 
     double threshhold = 1e-8;
-    for(std::vector<Motion3d>::iterator it = this->motions_ptr->begin();
-        it != this->motions_ptr->end();
+    for(std::vector<Motion3d>::const_iterator it = this->motions.begin();
+        it != this->motions.end();
         it++)
     {
       if ( ((*it).begin_time - time_stamp) <  threshhold

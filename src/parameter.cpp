@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:21:23
- * @LastEditTime: 2021-09-10 18:15:11
+ * @LastEditTime: 2021-09-11 11:10:35
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.cpp
@@ -53,8 +53,8 @@ namespace parameter{
     this->update(w(0), w(1), w(2), a(0), a(1), a(2), dt);
   }
 
-  bool posePropogate(PoseQPV &pose, const Eigen::Vector3d &w, const Eigen::Vector3d &a,
-                     const double &dt)
+  inline bool poseUpdate(PoseQPV &pose, const Eigen::Vector3d &w, const Eigen::Vector3d &a,
+                         const double &dt)
   {
     const PoseQPV pose0 = pose;
     quat_update_by_rot(pose.q, w * dt);

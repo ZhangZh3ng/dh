@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:08:03
- * @LastEditTime: 2021-09-11 08:31:00
+ * @LastEditTime: 2021-09-11 11:10:23
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.h
@@ -108,8 +108,8 @@ namespace parameter{
     double time_stamp = 0;
   };
 
-  bool posePropogate(PoseQPV &pose, const Eigen::Vector3d &w, const Eigen::Vector3d &a,
-                     const double &dt);
+  inline bool poseUpdate(PoseQPV &pose, const Eigen::Vector3d &w, const Eigen::Vector3d &a,
+                         const double &dt);
 
   /***************************************************************************
   *                            Format conversion                             *
