@@ -1,12 +1,15 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:21:23
- * @LastEditTime: 2021-09-12 11:15:15
+ * @LastEditTime: 2021-09-12 17:19:48
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.cpp
  */
 #include <iostream>
+
+#include <opencv2/core/core.hpp>
+
 #include "parameter.h"
 #include "geometry.h"
 
@@ -138,6 +141,39 @@ namespace parameter{
       p_end = *(it_pose+1);
       pose_to_imu(p_begin, p_end, imu_now);
       imu.push_back(imu_now);
+    }
+  }
+
+  void imu_add_error(std::vector<ImuMeasurement6d> &vimu,
+                     const ImuErrorParameter &err){
+    cv::RNG rng;
+    Eigen::Vector3d rw_bg, rw_ba, bg_now, ba_now, noise_error_g, noise_error_a;
+    rw_bg << 0, 0, 0;
+    rw_ba << 0, 0, 0;
+    const double dt = 1 / err.sample_rate;
+    const double sqdt = sqrt(dt);
+    for (std::vector<ImuMeasurement6d>::iterator it = vimu.begin();
+         it != vimu.end();
+         ++it)
+    {
+      rw_bg(0) += rng.gaussian(err.nbg(0)) * sqdt;
+      rw_bg(1) += rng.gaussian(err.nbg(1)) * sqdt;
+      rw_bg(2) += rng.gaussian(err.nbg(2)) * sqdt;
+      rw_ba(0) += rng.gaussian(err.nba(0)) * sqdt;
+      rw_ba(1) += rng.gaussian(err.nba(1)) * sqdt;
+      rw_ba(2) += rng.gaussian(err.nba(2)) * sqdt;
+      bg_now = err.bg + rw_bg;
+      ba_now = err.ba + rw_ba;
+
+      noise_error_g(0) = rng.gaussian(err.ng(0)) * sqdt;
+      noise_error_g(1) = rng.gaussian(err.ng(1)) * sqdt;
+      noise_error_g(2) = rng.gaussian(err.ng(2)) * sqdt;
+      noise_error_a(0) = rng.gaussian(err.na(0)) * sqdt;
+      noise_error_a(1) = rng.gaussian(err.na(1)) * sqdt;
+      noise_error_a(2) = rng.gaussian(err.na(2)) * sqdt;
+
+      (*it).w += (bg_now + noise_error_g);
+      (*it).a += (ba_now + noise_error_a);
     }
   }
 

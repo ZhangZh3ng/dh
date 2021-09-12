@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:08:03
- * @LastEditTime: 2021-09-12 10:37:40
+ * @LastEditTime: 2021-09-12 15:34:14
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.h
@@ -180,16 +180,31 @@ namespace parameter{
 
   void np_to_imu(const LocalNavigationParameter &np_begin,
                  const LocalNavigationParameter &np_end,
-                 ImuMeasurement6d &vimu);
+                 ImuMeasurement6d &imu);
 
   void np_to_imu(const std::vector<LocalNavigationParameter>& vnp,
                  std::vector<ImuMeasurement6d>& vimu);
 
-  void pose_to_imu(const PoseQPV &p_begin, const PoseQPV &p_end,
+  void pose_to_imu(const PoseQPV &p_begin,
+                   const PoseQPV &p_end,
                    ImuMeasurement6d &imu);
 
   void pose_to_imu(const std::vector<PoseQPV> &pose,
                    std::vector<ImuMeasurement6d> &imu);
+  
+  class ImuErrorParameter{
+  public:
+    Eigen::Vector3d bg = Eigen::Vector3d(0, 0, 0);  // bias of gyroscope, rad/s
+    Eigen::Vector3d ba = Eigen::Vector3d(0, 0, 0);  // bias of accelerometer, m/s^2
+    Eigen::Vector3d ng = Eigen::Vector3d(0, 0, 0);  // noise of gyroscope, rad/s^1.5
+    Eigen::Vector3d na = Eigen::Vector3d(0, 0, 0);  // noise of accelerometer, m/s^2.5
+    Eigen::Vector3d nbg = Eigen::Vector3d(0, 0, 0); // random walk of gyroscope, rad/s^2.5
+    Eigen::Vector3d nba = Eigen::Vector3d(0, 0, 0); // random walk of gyroscope, m/s^3.5
+    double sample_rate = 100;
+  };
+
+  void imu_add_error(std::vector<ImuMeasurement6d> &imu,
+                     const ImuErrorParameter &err);
 
   /***************************************************************************
   *                             For ceres                                     *

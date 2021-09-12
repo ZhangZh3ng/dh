@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 20:29:24
- * @LastEditTime: 2021-09-12 11:15:41
+ * @LastEditTime: 2021-09-12 15:54:21
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/test_trajectory_generator.cpp
@@ -72,6 +72,7 @@ void test5(){
     traj.addMotion(90, 0, 0, 0, 0, 0, 0);
     traj.addMotion(9, 10*degree_per_second, 0, 0, 0, 0, 0);
     traj.addMotion(100, 0, 0, 0, 0, 0, 0);
+    traj.briefReport();
 
     vector<LocalNavigationParameter> vnp;
     generateTrajectory<LocalNavigationParameter>(vnp, np, traj, 0.01);
@@ -85,8 +86,13 @@ void test5(){
     pose_to_imu(vpose, vimu);
     // np_to_imu(vnp, vimu);
     writeVector<ImuMeasurement6d>("/home/zz/桌面/cpp_project/dh/data/imu.txt", vimu);
+
+    ImuErrorParameter imuerr;
+    imuerr.ba << 0, 0.1, 0;
+    imuerr.na << 0.01, 0.02, 0.05;
+    imu_add_error(vimu, imuerr);
+    writeVector<ImuMeasurement6d>("/home/zz/桌面/cpp_project/dh/data/imuerr.txt", vimu);
     std::cout << "it's ok" << std::endl;
- 
 }
 
 void test6(){
