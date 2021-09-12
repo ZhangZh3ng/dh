@@ -14,7 +14,7 @@
 namespace dh{
 namespace write{
   bool writeNavigationParameters(std::fstream &file,
-                                 const NavigationParameter3d &np){
+                                 const LocalNavigationParameter &np){
     file << np.time_stamp << " "
          << np.yaw << " " << np.pitch << " " << np.roll << " "
          << np.vx << " " << np.vy << " " << np.vz << " "

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:08:03
- * @LastEditTime: 2021-09-11 11:10:23
+ * @LastEditTime: 2021-09-12 10:37:40
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.h
@@ -30,9 +30,9 @@ namespace parameter{
   *                         NavigationParameter3d                             *
   ***************************************************************************/ 
 
-  struct NavigationParameter3d{
+  struct LocalNavigationParameter{
   public:
-    NavigationParameter3d(const double &v_yaw,
+    LocalNavigationParameter(const double &v_yaw,
                           const double &v_pitch,
                           const double &v_roll,
                           const double &v_vx,
@@ -48,7 +48,7 @@ namespace parameter{
           px(v_px), py(v_py), pz(v_pz), time_stamp(v_time_stamp),
           euler_angle_type(euler_type) {}
 
-    NavigationParameter3d(const Eigen::Vector3d &ypr,
+    LocalNavigationParameter(const Eigen::Vector3d &ypr,
                           const Eigen::Vector3d &vxyz,
                           const Eigen::Vector3d &pxyz,
                           const double &v_time_stamp = 0,
@@ -81,7 +81,7 @@ namespace parameter{
     EulerAngleType euler_angle_type;
   };
 
-  inline std::ostream &operator<<(std::ostream &os, const NavigationParameter3d& np){
+  inline std::ostream &operator<<(std::ostream &os, const LocalNavigationParameter& np){
     os << np.time_stamp
        << " " << np.yaw << " " << np.pitch << " " << np.roll
        << " " << np.vx << " " << np.vy << " " << np.vz
@@ -89,18 +89,21 @@ namespace parameter{
     return os;
   }
 
-  void np_to_pose(const NavigationParameter3d &np,
-                  Pose3d &pose);
-
   /***************************************************************************
   *                                 PoseQPV                                  *
   ***************************************************************************/ 
 
+ /**
+  * @brief add velocity and time stamp to ceres::Poses3d.
+  */
   struct PoseQPV{
   public:
     PoseQPV(){}
     PoseQPV(const Eigen::Quaterniond &v_q, const Eigen::Vector3d &v_p,
             const Eigen::Vector3d &v_v, const double &v_time_stamp = 0) : q(v_q), p(v_p), v(v_v), time_stamp(v_time_stamp) {}
+
+    void updateByAcc(const Eigen::Vector3d &w, const Eigen::Vector3d&a, const double &dt);
+    std::string name() const {return "PoseQPV";}
 
     Eigen::Quaterniond q = Eigen::Quaterniond::Identity();
     Eigen::Vector3d p = Eigen::Vector3d(0, 0, 0);
@@ -108,17 +111,29 @@ namespace parameter{
     double time_stamp = 0;
   };
 
-  inline bool poseUpdate(PoseQPV &pose, const Eigen::Vector3d &w, const Eigen::Vector3d &a,
-                         const double &dt);
+  inline std::ostream &operator<<(std::ostream &os, const PoseQPV &pose)
+  {
+    os << pose.time_stamp << " "
+       << pose.q.w() << " " << pose.q.x() << " " << pose.q.y() << " " << pose.q.z() << " "
+       << pose.p(0) << " " << pose.p(1) << " " << pose.p(2) << " "
+       << pose.v(0) << " " << pose.v(1) << " " << pose.v(2);
+    return os;
+  }
 
   /***************************************************************************
   *                            Format conversion                             *
   ***************************************************************************/
-  template<class NpType>
+  void np_to_pose(const LocalNavigationParameter &np,
+                  Pose3d &pose);
+
+  void np_to_pose(const LocalNavigationParameter &np,
+                  PoseQPV &pose);
+
+  template<class NpType, class PoseType>
   void np_to_pose(std::vector<NpType>& vnp,
-                  std::vector<Pose3d>& vpose){
+                  std::vector<PoseType>& vpose){
     vpose.clear();
-    Pose3d pose;
+    PoseType pose;
     for(typename std::vector<NpType>::iterator it = vnp.begin();
         it != vnp.end();
         ++it){
@@ -156,12 +171,19 @@ namespace parameter{
     double time_stamp;
   };
 
-  inline std::ostream &operator<<(std::ostream &os, ImuMeasurement6d &imu){
+  inline std::ostream &operator<<(std::ostream &os, const ImuMeasurement6d &imu){
     os << imu.time_stamp << " " << imu.w(0) << " " << imu.w(1)
        << " " << imu.w(2) << " " << imu.a(0) << " " << imu.a(1)
        << " " << imu.a(2);
     return os;
   }
+
+  void np_to_imu(const LocalNavigationParameter &np_begin,
+                 const LocalNavigationParameter &np_end,
+                 ImuMeasurement6d &vimu);
+
+  void np_to_imu(const std::vector<LocalNavigationParameter>& vnp,
+                 std::vector<ImuMeasurement6d>& vimu);
 
   void pose_to_imu(const PoseQPV &p_begin, const PoseQPV &p_end,
                    ImuMeasurement6d &imu);

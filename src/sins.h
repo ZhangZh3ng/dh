@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-07 10:02:48
- * @LastEditTime: 2021-09-11 16:02:56
+ * @LastEditTime: 2021-09-11 19:32:40
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/sins.hpp
@@ -15,7 +15,6 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-// #include "core.hpp"
 #include "wgs84.h"
 #include "geometry.h"
 
@@ -169,6 +168,12 @@ namespace sins{
     }
   };
 
+  /**
+   * @brief convert ecef coordinate to latitude longitude altitude.
+   * 
+   * @param ecef 
+   * @return Eigen::Vector3d 
+   */
   inline Eigen::Vector3d ecef_to_lla(const Eigen::Vector3d& ecef){
     Eigen::Vector3d lla;
     const double Re = dh::wgs84::Re;
@@ -197,6 +202,12 @@ namespace sins{
     return lla;
   }
 
+  /**
+   * @brief convert latitude, longitude, altitude to ecef coordinate.
+   * 
+   * @param lla latitude(rad) longitude(rad) altitude(m)
+   * @return Eigen::Vector3d 
+   */
   inline Eigen::Vector3d lla_to_ecef(const Eigen::Vector3d& lla){
     Eigen::Vector3d ecef;
     double lat, lon, alt, x, y, z;

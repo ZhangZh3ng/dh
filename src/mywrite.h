@@ -26,7 +26,7 @@ namespace dh{
 namespace write{
 
   bool writeNavigationParameters(std::fstream &file,
-                                 const NavigationParameter3d &np);
+                                 const LocalNavigationParameter &np);
                             
   bool writeG2oVertexSE3(std::fstream &file,
                     const int pose_id,

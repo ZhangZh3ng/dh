@@ -96,7 +96,7 @@ namespace tg{
       std::vector<Motion3d> motions;
       int num_motions = 0;
       double total_time = 0;
-      // NavigationParameter3d initial_parameter;
+      // LocalNavigationParameter initial_parameter;
   };
 
   template <class NpType>

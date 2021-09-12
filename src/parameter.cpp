@@ -1,12 +1,12 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:21:23
- * @LastEditTime: 2021-09-11 11:10:35
+ * @LastEditTime: 2021-09-12 11:15:15
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.cpp
  */
-
+#include <iostream>
 #include "parameter.h"
 #include "geometry.h"
 
@@ -16,10 +16,10 @@ namespace dh{
 namespace parameter{
 
   /***************************************************************************
-  *                         NavigationParameter3d                            *
+  *                         LocalNavigationParameter                            *
   ***************************************************************************/
 
-  void NavigationParameter3d::update(const double &wy, const double &wp, const double &wr,
+  void LocalNavigationParameter::update(const double &wy, const double &wp, const double &wr,
                                      const double &ax, const double &ay, const double &az,
                                      const double &dt)
   {
@@ -46,24 +46,24 @@ namespace parameter{
     this->time_stamp += dt;
   }
 
-  void NavigationParameter3d::update(const Eigen::Vector3d &w,
+  void LocalNavigationParameter::update(const Eigen::Vector3d &w,
                                      const Eigen::Vector3d &a,
                                      const double &dt)
   {
     this->update(w(0), w(1), w(2), a(0), a(1), a(2), dt);
   }
 
-  inline bool poseUpdate(PoseQPV &pose, const Eigen::Vector3d &w, const Eigen::Vector3d &a,
-                         const double &dt)
-  {
-    const PoseQPV pose0 = pose;
-    quat_update_by_rot(pose.q, w * dt);
-    pose.v = pose0.v + pose0.q * a * dt;
-    pose.p = pose0.p + (pose.v + pose0.v) / 2 * dt;
-    return true;
+  void PoseQPV::updateByAcc(const Eigen::Vector3d &w, const Eigen::Vector3d&a, const double &dt){
+    const Eigen::Quaterniond q0 = this->q;
+    const Eigen::Vector3d p0 = this->p;
+    const Eigen::Vector3d v0 = this->v;
+    this->q = quat_add_rot(this->q, w * dt);
+    this->v = v0 + q0 * a * dt;
+    this->p = p + (v0 + this->v) / 2 * dt;
+    this->time_stamp += dt;
   }
 
-  void np_to_pose(const NavigationParameter3d &np,
+  void np_to_pose(const LocalNavigationParameter &np,
                   Pose3d &pose)
   {
     pose.p(0) = np.px;
@@ -73,6 +73,38 @@ namespace parameter{
                          np.euler_angle_type);
   }
 
+  void np_to_pose(const LocalNavigationParameter &np,
+                  PoseQPV &pose){
+    pose.p(0) = np.px;
+    pose.p(1) = np.py;
+    pose.p(2) = np.pz;
+    pose.v(0) = np.vx;
+    pose.v(1) = np.vy;
+    pose.v(2) = np.vz;
+    pose.time_stamp = np.time_stamp;
+    pose.q = ypr_to_quat(np.yaw, np.pitch, np.roll,
+                         np.euler_angle_type);                
+  }
+
+  void np_to_imu(const LocalNavigationParameter &np_begin,
+                 const LocalNavigationParameter &np_end,
+                 ImuMeasurement6d &vimu){
+                  
+  }
+
+  void np_to_imu(const std::vector<LocalNavigationParameter>& vnp,
+                 std::vector<ImuMeasurement6d>& vimu){
+    PoseQPV pose;
+    std::vector<PoseQPV> vpose;
+    for(std::vector<LocalNavigationParameter>::const_iterator it = vnp.begin();
+        it != vnp.end();
+        ++it){
+          np_to_pose(*it, pose);
+          vpose.push_back(pose);
+    }
+    pose_to_imu(vpose, vimu);
+  }
+
   void pose_to_imu(const PoseQPV &p_begin, const PoseQPV &p_end,
                    ImuMeasurement6d &imu)
   {
@@ -80,8 +112,16 @@ namespace parameter{
     imu.time_stamp = p_begin.time_stamp;
     // Qe = Qb * dq(w*dt)
     imu.w = quat_increment_to_rot(p_begin.q, p_end.q) / dt;
+    // imu.w = quat_increment_to_rot(p_begin.q, p_end.q);
+    // std::cout << p_begin.q.coeffs()<< std::endl;
+    // std::cout << p_end.q.coeffs()<< std::endl;
+    // imu.w << 0, 0, 0;
+    // imu.w << p_begin.q.w(), p_begin.q.y(), p_begin.q.z();
+
     // Ve = Vb + R(Qb)*(a*dt)
-    imu.a = p_begin.q.inverse() * (p_end.v - p_begin.v) / dt;
+    Eigen::Vector3d gn;
+    gn << 0, 0, -9.8;
+    imu.a = p_begin.q.inverse() * ((p_end.v - p_begin.v) / dt - gn);
   }
 
   void pose_to_imu(const std::vector<PoseQPV> &pose,

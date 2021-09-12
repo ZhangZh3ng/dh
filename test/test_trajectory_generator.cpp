@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 20:29:24
- * @LastEditTime: 2021-09-11 15:59:20
+ * @LastEditTime: 2021-09-12 11:15:41
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/test_trajectory_generator.cpp
@@ -56,7 +56,7 @@ void test2(){
 
     Eigen::Vector3d rot;
     rot << 0.11, 0.2, 1.5;
-    quat_update_by_rot(q, rot);
+    q = quat_add_rot(q, rot);
     std::cout << "after add rot: \n" << q.coeffs() << std::endl;
 
     Eigen::Vector3d rot2;
@@ -66,17 +66,25 @@ void test2(){
 
 void test5(){
     Trajectory3d traj;
-    NavigationParameter3d np(0, 0, 0, 0, 0, 0, 0, 0, 0);
+    LocalNavigationParameter np(0, 0, 0, 0, 0, 0, 0, 0, 0);
     traj.addMotion(Motion3d(0, 10, 0, 0, 0, 0, 1, 0));
     traj.addMotion(10, 0, 0, 0, 0, 1, 0);
     traj.addMotion(90, 0, 0, 0, 0, 0, 0);
-    traj.addMotion(9, 10*degree, 0, 0, 0, 0, 0);
+    traj.addMotion(9, 10*degree_per_second, 0, 0, 0, 0, 0);
     traj.addMotion(100, 0, 0, 0, 0, 0, 0);
 
-    vector<NavigationParameter3d> vnp;
+    vector<LocalNavigationParameter> vnp;
+    generateTrajectory<LocalNavigationParameter>(vnp, np, traj, 0.01);
+    writeVector<LocalNavigationParameter>("/home/zz/桌面/cpp_project/dh/data/np.txt", vnp);
 
-    generateTrajectory<NavigationParameter3d>(vnp, np, traj, 0.01);
-    writeVector<NavigationParameter3d>("/home/zz/桌面/cpp_project/dh/data/np.txt", vnp);
+    std::vector<PoseQPV> vpose;
+    np_to_pose<LocalNavigationParameter, PoseQPV>(vnp, vpose);
+    writeVector<PoseQPV>("/home/zz/桌面/cpp_project/dh/data/pose.txt", vpose);
+
+    std::vector<ImuMeasurement6d> vimu;
+    pose_to_imu(vpose, vimu);
+    // np_to_imu(vnp, vimu);
+    writeVector<ImuMeasurement6d>("/home/zz/桌面/cpp_project/dh/data/imu.txt", vimu);
     std::cout << "it's ok" << std::endl;
  
 }
@@ -94,7 +102,24 @@ void test6(){
     std::cout << lla << std::endl;
 }
 
+void test7(){
+    Eigen::Quaterniond q1, q2, dq;
+    q1 = Eigen::Quaterniond::Identity();
+    Eigen::Vector3d rot;
+    rot << 1*degree, 0.5*degree, 0*degree;
+
+    q2 = quat_add_rot(q1, rot);
+    std::cout << "q2=\n" << q2.coeffs() << std::endl;
+
+    dq = q1.inverse() * q2;
+    // dq = q1.inverse();
+    std::cout << "dq=\n" << dq.coeffs() << std::endl;
+
+    rot = quat_increment_to_rot(q1, q2);
+    std::cout<< rot/degree << std::endl;
+}
+
 int main(){
-    test6();
+    test5();
     return 0;
 }

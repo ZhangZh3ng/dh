@@ -13,7 +13,7 @@ find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 find_package( Ceres REQUIRED )
 include_directories( ${CERES_INCLUDE_DIRS} )
-include_directories( ${CMAKE_SOURCE_DIR}/external )
+include_directories( ${CMAKE_SOURCE_DIR}/external)
 include_directories( ${CMAKE_SOURCE_DIR}/src )
 
 add_subdirectory(src)
