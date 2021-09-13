@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:08:03
- * @LastEditTime: 2021-09-13 19:40:11
+ * @LastEditTime: 2021-09-13 22:06:47
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.h
@@ -169,12 +169,44 @@ namespace dh{
     double time_stamp;
   };
 
+  inline ImuMeasurement6d operator-(const ImuMeasurement6d &a,
+                                    const ImuMeasurement6d &b)
+  {
+    double time_stamp = 0;
+    if (abs(a.time_stamp - b.time_stamp) < 1e-8)
+      time_stamp = a.time_stamp;
+    return ImuMeasurement6d(a.w - b.w, a.a - b.a, time_stamp);
+  }
+
   inline std::ostream &operator<<(std::ostream &os, const ImuMeasurement6d &imu){
     os << imu.time_stamp << " " << imu.w(0) << " " << imu.w(1)
        << " " << imu.w(2) << " " << imu.a(0) << " " << imu.a(1)
        << " " << imu.a(2);
     return os;
   }
+
+  typedef std::vector<ImuMeasurement6d> ImuVector;
+
+  inline ImuVector operator-(const ImuVector &v1,
+                             const ImuVector &v2){
+    ImuVector vout;
+    vout.clear();
+    if(v1.size() != v2.size()){
+      return vout;
+    }  
+    
+    ImuMeasurement6d diff(Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero(), 0);
+    for (ImuVector::const_iterator it1 = v1.begin(), it2 = v2.begin();
+         it1 != v1.end();
+         ++it1, ++it2)
+    {
+      diff = (*it1) - (*it2);
+      vout.push_back(diff);
+    }
+    return vout;
+  }
+
+
 
   void np_to_imu(const LocalNavigationParameter &np_begin,
                  const LocalNavigationParameter &np_end,
@@ -194,10 +226,10 @@ namespace dh{
   public:
     Eigen::Vector3d bg = Eigen::Vector3d(0, 0, 0);  // bias of gyroscope, rad/s
     Eigen::Vector3d ba = Eigen::Vector3d(0, 0, 0);  // bias of accelerometer, m/s^2
-    Eigen::Vector3d ng = Eigen::Vector3d(0, 0, 0);  // noise of gyroscope, rad/s^1.5
-    Eigen::Vector3d na = Eigen::Vector3d(0, 0, 0);  // noise of accelerometer, m/s^2.5
-    Eigen::Vector3d nbg = Eigen::Vector3d(0, 0, 0); // random walk of gyroscope, rad/s^2.5
-    Eigen::Vector3d nba = Eigen::Vector3d(0, 0, 0); // random walk of gyroscope, m/s^3.5
+    Eigen::Vector3d ng = Eigen::Vector3d(0, 0, 0);  // noise of gyroscope, rad/s^0.5
+    Eigen::Vector3d na = Eigen::Vector3d(0, 0, 0);  // noise of accelerometer, m/s^1.5
+    Eigen::Vector3d nbg = Eigen::Vector3d(0, 0, 0); // random walk of gyroscope, rad/s^1.5
+    Eigen::Vector3d nba = Eigen::Vector3d(0, 0, 0); // random walk of gyroscope, m/s^2.5
     double sample_rate = 100;
   };
 
