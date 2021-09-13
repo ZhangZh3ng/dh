@@ -11,7 +11,6 @@
 #define DH_TYPE_H
 
 namespace dh{
-namespace type{
 
   enum class EulerAngleType{ZYX, ZXY};
 
@@ -23,8 +22,6 @@ namespace type{
     CERES_Pose3d,
     XYZ_NavigationParameter
   };
-
-} // namespace type
 } // namespace dh
 
 #endif // DH_TYPE_H

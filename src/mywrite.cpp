@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 16:30:41
- * @LastEditTime: 2021-09-10 16:06:41
+ * @LastEditTime: 2021-09-13 09:46:30
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/write.cpp
@@ -12,7 +12,6 @@
 #include "mywrite.h"
 
 namespace dh{
-namespace write{
   bool writeNavigationParameters(std::fstream &file,
                                  const LocalNavigationParameter &np){
     file << np.time_stamp << " "
@@ -44,4 +43,3 @@ namespace write{
   }
   
 } // namespace dh
-} // namespace write

@@ -14,7 +14,6 @@
 #include <Eigen/Geometry>
 
 namespace dh{
-namespace utils{
     /**
     * @brief Return the anti-skew matrix corresponding to the input 3x1 vector
     * 
@@ -69,6 +68,5 @@ namespace utils{
         return result;
     }
 
-} // namespace utils
 } // namespace dh
 #endif // DH_UTILS_H

@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-07 10:02:48
- * @LastEditTime: 2021-09-11 19:32:40
+ * @LastEditTime: 2021-09-13 10:09:08
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/sins.hpp
@@ -18,10 +18,9 @@
 #include "wgs84.h"
 #include "geometry.h"
 
-using namespace dh::geometry;
+using namespace dh;
 
 namespace dh{
-namespace sins{
 
 /**
  * @brief Return the radii of earth at latitude = lat and altitude = alt.
@@ -32,8 +31,8 @@ namespace sins{
   inline Eigen::Matrix<double, 2, 1> earth_radii(const double &lat)
   {
     Eigen::Matrix<double, 2, 1> R;
-    R(0) = dh::wgs84::Re * (1 - dh::wgs84::e2) / std::pow((1 - dh::wgs84::e2 * std::sin(lat) * std::sin(lat)), 1.5);
-    R(1) = dh::wgs84::Re / (pow(1 - dh::wgs84::e2 * std::sin(lat) * std::sin(lat), 0.5));
+    R(0) = C_Re * (1 - C_e2) / std::pow((1 - C_e2 * std::sin(lat) * std::sin(lat)), 1.5);
+    R(1) = C_Re / (pow(1 - C_e2 * std::sin(lat) * std::sin(lat), 0.5));
     return R;
   }
 
@@ -61,11 +60,10 @@ namespace sins{
  */
   inline Eigen::Matrix<double, 3, 1> wie_in_enu(const double &lat)
   {
-      const double wie = dh::wgs84::wie;
       Eigen::Matrix<double, 3, 1> w_ie_n;
       w_ie_n(0) = 0;
-      w_ie_n(1) = wie * std::cos(lat);
-      w_ie_n(2) = wie * std::sin(lat);
+      w_ie_n(1) = C_wie * std::cos(lat);
+      w_ie_n(2) = C_wie * std::sin(lat);
       return w_ie_n;
   }
 
@@ -82,7 +80,7 @@ namespace sins{
   {
       Eigen::Matrix<double, 3, 1> w_en_n;
       Eigen::Matrix<double, 2, 1> Rmn;
-      Rmn = dh::sins::earth_radii(lat);
+      Rmn = earth_radii(lat);
       w_en_n(0) = -vn / (Rmn(0) + alt);
       w_en_n(1) = ve / (Rmn(1) + alt);
       w_en_n(2) = ve / (Rmn(1) + alt) * std::tan(lat);
@@ -101,7 +99,7 @@ namespace sins{
   inline Eigen::Matrix<double, 3, 1> win_in_enu(const double &lat, const double &alt, const double &ve, const double &vn)
   {
       Eigen::Matrix<double, 3, 1> w_in_n;
-      w_in_n = dh::sins::wie_in_enu(lat) + dh::sins::wen_in_enu(lat, alt, ve, vn);
+      w_in_n = wie_in_enu(lat) + wen_in_enu(lat, alt, ve, vn);
       return w_in_n;
   }
 
@@ -115,7 +113,7 @@ namespace sins{
   inline Eigen::Matrix<double, 3, 3> sins_Mpv_enu(const double &lat, const double &alt)
   {
     Eigen::Matrix<double, 3, 3> mat;
-    Eigen::Matrix<double, 2, 1> Rmn = dh::sins::earth_radii(lat);
+    Eigen::Matrix<double, 2, 1> Rmn = earth_radii(lat);
     mat << 0, 1 / (Rmn(0) + alt), 0, 1 / std::cos(lat) / (Rmn(1) + alt), 0, 0, 0, 0, 1;
     return mat;
   }
@@ -150,20 +148,20 @@ namespace sins{
       const Eigen::Vector3d lla0 = this->lla_;
 
       // attitude update
-      Eigen::Quaterniond q_bt_b0 = dh::geometry::rot_to_quat(w_ib_b * t);
+      Eigen::Quaterniond q_bt_b0 = rot_to_quat(w_ib_b * t);
       Eigen::Vector3d w_in_n;
       w_in_n << 0, 0, 0;
-      Eigen::Quaterniond q_n0_nt = dh::geometry::rot_to_quat(w_in_n * t);
+      Eigen::Quaterniond q_n0_nt = rot_to_quat(w_in_n * t);
       Eigen::Quaterniond q_b_n = q_n0_nt * q_b_n_0 * q_bt_b0;
       this->q_ = q_b_n;
 
       // velocity update
       Eigen::Vector3d f_ib_n = (q_b_n_0 * f_ib_b + q_b_n * f_ib_b) * t / 2;
-      Eigen::Vector3d v_eb_n = v_eb_n_0 + (f_ib_n - dh::sins::gravity_in_enu(lat0, alt0)) * t;
+      Eigen::Vector3d v_eb_n = v_eb_n_0 + (f_ib_n - gravity_in_enu(lat0, alt0)) * t;
       this->vn_ = v_eb_n;
 
       // position update
-      Eigen::Vector3d lla = lla0 + dh::sins::sins_Mpv_enu(lat0, alt0) * (v_eb_n + v_eb_n_0) * t / 2;
+      Eigen::Vector3d lla = lla0 + sins_Mpv_enu(lat0, alt0) * (v_eb_n + v_eb_n_0) * t / 2;
       this->lla_ = lla;
     }
   };
@@ -176,8 +174,6 @@ namespace sins{
    */
   inline Eigen::Vector3d ecef_to_lla(const Eigen::Vector3d& ecef){
     Eigen::Vector3d lla;
-    const double Re = dh::wgs84::Re;
-    const double e2 = dh::wgs84::e2;
     double x, y, z, lat, lon, alt;
     x = ecef(0);
     y = ecef(1);
@@ -191,12 +187,12 @@ namespace sins{
     while (iter_times < MAX_ITER_TIME)
     {
       ++iter_times;
-      t = 1 / sqrt(x * x + y * y) * (z + Re * e2 * t0 / sqrt(1 + (1 - e2) * t0 * t0));
+      t = 1 / sqrt(x * x + y * y) * (z + C_Re * C_e2 * t0 / sqrt(1 + (1 - C_e2) * t0 * t0));
       t0 = t;
     }
     lat = atan(t);
     // altitude:
-    double Rn = Re / sqrt(1 - e2 * pow(sin(lat), 2));
+    double Rn = C_Re / sqrt(1 - C_e2 * pow(sin(lat), 2));
     alt = sqrt(x * x + y * y) / cos(lat) - Rn;
     lla << lat, lon, alt;
     return lla;
@@ -214,17 +210,13 @@ namespace sins{
     lat = lla(0);
     lon = lla(1);
     alt = lla(2);
-    const double Re = dh::wgs84::Re;
-    const double e2 = dh::wgs84::e2;
-    const double Rn = Re / sqrt(1 - e2 * pow(sin(lat), 2));
+    const double Rn = C_Re / sqrt(1 - C_e2 * pow(sin(lat), 2));
     x = (Rn + alt) * cos(lat) * cos(lon);
     y = (Rn + alt) * cos(lat) * sin(lon);
-    z = (Rn * (1 - e2) + alt) * sin(lat);
+    z = (Rn * (1 - C_e2) + alt) * sin(lat);
     ecef << x, y, z;
     return ecef;
   }
 
-} // namespace sins
 } // namespace dh
-
 #endif // DH_SINS_H

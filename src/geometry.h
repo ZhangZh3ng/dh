@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-02 20:13:13
- * @LastEditTime: 2021-09-12 11:16:03
+ * @LastEditTime: 2021-09-13 09:49:10
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/geometry.h
@@ -17,10 +17,8 @@
 
 #include "type.h"
 
-using namespace dh::type;
 
 namespace dh{
-namespace geometry{
 
   inline Eigen::Matrix3d rmat(const double r, RotationAxis axis){
     Eigen::Matrix3d mat;
@@ -341,6 +339,5 @@ namespace geometry{
     return has_change;
   }
 
-} // namespace geometry
 } // namespace dh
 #endif // DH_GEOMETRY_H_

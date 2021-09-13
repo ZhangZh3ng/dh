@@ -19,11 +19,9 @@
 #include "slam/pose_graph_3d/types.h"
 
 
-using namespace dh::parameter;
 using namespace ceres::examples;
 
 namespace dh{
-namespace write{
 
   bool writeNavigationParameters(std::fstream &file,
                                  const LocalNavigationParameter &np);
@@ -55,6 +53,5 @@ namespace write{
     return true;
   }
 } // namespace dh
-} // namespace write
 
 #endif

@@ -13,10 +13,9 @@
 #include "parameter.h"
 #include "geometry.h"
 
-using namespace dh::geometry;
+using namespace dh;
 
 namespace dh{
-namespace parameter{
 
   /***************************************************************************
   *                         LocalNavigationParameter                            *
@@ -177,5 +176,4 @@ namespace parameter{
     }
   }
 
-} // namespace parameter
 } // namespace dh

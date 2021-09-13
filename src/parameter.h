@@ -21,10 +21,8 @@
 #include "type.h"
 
 using namespace ceres::examples;
-using namespace dh::type;
 
 namespace dh{
-namespace parameter{
 
   /***************************************************************************
   *                         NavigationParameter3d                             *
@@ -218,7 +216,6 @@ namespace parameter{
     return pbe;
   }
 
-} // namespace parameter
 } // namespace dh
 
 #endif

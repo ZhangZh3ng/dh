@@ -70,7 +70,8 @@
         "*.ipp": "cpp",
         "csetjmp": "cpp",
         "unordered_set": "cpp",
-        "scoped_allocator": "cpp"
+        "scoped_allocator": "cpp",
+        "*.txx": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }

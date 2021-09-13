@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-06 15:33:52
- * @LastEditTime: 2021-09-06 16:16:32
+ * @LastEditTime: 2021-09-13 09:46:08
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/imu.h
@@ -18,10 +18,7 @@
 #include "parameter.h"
 
 
-using namespace dh::parameter;
-
 namespace dh{
-namespace sensor{
 
   class Imu6d{
   public:
@@ -36,13 +33,5 @@ namespace sensor{
     Eigen::Vector3d nba = Eigen::Vector3d(0, 0, 0);
   };
 
-}
-}
-
-
-
-
-
-
-
+} // dh
 #endif // DH_IMU_H

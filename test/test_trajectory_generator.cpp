@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 20:29:24
- * @LastEditTime: 2021-09-12 15:54:21
+ * @LastEditTime: 2021-09-13 10:07:34
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/test_trajectory_generator.cpp
@@ -17,11 +17,7 @@
 #include "sins.h"
 
 using namespace std;
-using namespace dh::tg;
-using namespace dh::geometry;
-using namespace dh::unit;
-using namespace dh::write;
-using namespace dh::sins;
+using namespace dh;
 
 void test1(){
     Motion3d motion(0, 10, 1, 1, 1, 2, 2 ,2);
@@ -70,7 +66,7 @@ void test5(){
     traj.addMotion(Motion3d(0, 10, 0, 0, 0, 0, 1, 0));
     traj.addMotion(10, 0, 0, 0, 0, 1, 0);
     traj.addMotion(90, 0, 0, 0, 0, 0, 0);
-    traj.addMotion(9, 10*degree_per_second, 0, 0, 0, 0, 0);
+    traj.addMotion(9, 10*C_degree_per_second, 0, 0, 0, 0, 0);
     traj.addMotion(100, 0, 0, 0, 0, 0, 0);
     traj.briefReport();
 
@@ -97,7 +93,7 @@ void test5(){
 
 void test6(){
     Eigen::Vector3d lla;
-    lla << 45*degree, 120*degree, 100;
+    lla << 45*C_degree, 120*C_degree, 100;
     std::cout << lla << std::endl;
     Eigen::Vector3d ecef;
     ecef = lla_to_ecef(lla);
@@ -112,7 +108,7 @@ void test7(){
     Eigen::Quaterniond q1, q2, dq;
     q1 = Eigen::Quaterniond::Identity();
     Eigen::Vector3d rot;
-    rot << 1*degree, 0.5*degree, 0*degree;
+    rot << 1*C_degree, 0.5*C_degree, 0*C_degree;
 
     q2 = quat_add_rot(q1, rot);
     std::cout << "q2=\n" << q2.coeffs() << std::endl;
@@ -122,7 +118,7 @@ void test7(){
     std::cout << "dq=\n" << dq.coeffs() << std::endl;
 
     rot = quat_increment_to_rot(q1, q2);
-    std::cout<< rot/degree << std::endl;
+    std::cout<< rot/C_degree << std::endl;
 }
 
 int main(){

@@ -10,10 +10,9 @@
 #include "trajectory_generator.h"
 #include "mywrite.h"
 
-using namespace dh::write;
+using namespace dh;
 
 namespace dh{
-namespace tg{
 
   /***************************************************************************
   *                             Trajectory3d                                 *
@@ -72,5 +71,4 @@ namespace tg{
     return true;
   }
 
-}   // namespace tg  
 }   // namespace dh
