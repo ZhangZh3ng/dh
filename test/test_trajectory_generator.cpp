@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 20:29:24
- * @LastEditTime: 2021-09-13 10:07:34
+ * @LastEditTime: 2021-09-13 10:12:09
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/test_trajectory_generator.cpp
@@ -99,8 +99,8 @@ void test6(){
     ecef = lla_to_ecef(lla);
     std::cout << ecef << std::endl;
     lla = ecef_to_lla(ecef);
-    // lla(0) = lla(0)/degree;
-    // lla(1) = lla(1)/degree;
+    // lla(0) = lla(0)/C_degree;
+    // lla(1) = lla(1)/C_degree;
     std::cout << lla << std::endl;
 }
 

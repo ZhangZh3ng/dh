@@ -6,7 +6,10 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/external/**",
                 "${workspaceFolder}/external/slam/pose_graph_3d/**",
-                "/usr/include/eigen3"
+                "/usr/include/eigen3",
+                "${workspaceFolder}/external/vins_estimator/src/factor/**",
+                "${workspaceFolder}/external/vins_estimator/src/initial/**",
+                "${workspaceFolder}/external/vins_estimator/src/utility/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

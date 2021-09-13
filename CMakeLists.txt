@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 project(dh)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 add_compile_options(-std=c++11)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
@@ -20,4 +20,5 @@ include_directories( ${CMAKE_SOURCE_DIR}/src )
 
 add_subdirectory(src)
 add_subdirectory(test)
-add_subdirectory(external/slam)
+add_subdirectory(external/ceres_example_slam)
+add_subdirectory(external/vinsmono)

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:08:03
- * @LastEditTime: 2021-09-12 15:34:14
+ * @LastEditTime: 2021-09-13 19:40:11
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.h
@@ -16,7 +16,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-#include "slam/pose_graph_3d/types.h"
+#include "ceres_example_slam/pose_graph_3d/types.h"
 
 #include "type.h"
 
