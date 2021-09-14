@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:08:03
- * @LastEditTime: 2021-09-13 22:06:47
+ * @LastEditTime: 2021-09-14 15:07:18
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.h
@@ -17,8 +17,8 @@
 #include <Eigen/Geometry>
 
 #include "ceres_example_slam/pose_graph_3d/types.h"
-
 #include "type.h"
+
 
 using namespace ceres::examples;
 
@@ -206,8 +206,6 @@ namespace dh{
     return vout;
   }
 
-
-
   void np_to_imu(const LocalNavigationParameter &np_begin,
                  const LocalNavigationParameter &np_end,
                  ImuMeasurement6d &imu);
@@ -222,15 +220,24 @@ namespace dh{
   void pose_to_imu(const std::vector<PoseQPV> &pose,
                    std::vector<ImuMeasurement6d> &imu);
   
+  /***************************************************************************
+  *                             ImuMeasurement6d                             *
+  ***************************************************************************/
+
   class ImuErrorParameter{
   public:
-    Eigen::Vector3d bg = Eigen::Vector3d(0, 0, 0);  // bias of gyroscope, rad/s
-    Eigen::Vector3d ba = Eigen::Vector3d(0, 0, 0);  // bias of accelerometer, m/s^2
-    Eigen::Vector3d ng = Eigen::Vector3d(0, 0, 0);  // noise of gyroscope, rad/s^0.5
-    Eigen::Vector3d na = Eigen::Vector3d(0, 0, 0);  // noise of accelerometer, m/s^1.5
-    Eigen::Vector3d nbg = Eigen::Vector3d(0, 0, 0); // random walk of gyroscope, rad/s^1.5
-    Eigen::Vector3d nba = Eigen::Vector3d(0, 0, 0); // random walk of gyroscope, m/s^2.5
-    double sample_rate = 100;
+
+    Eigen::Vector3d bg = Eigen::Vector3d(0, 0, 0);  // gyroscope bias, rad/s
+    Eigen::Vector3d ba = Eigen::Vector3d(0, 0, 0);  // accelerometer bias, m/s^2
+    Eigen::Vector3d ng = Eigen::Vector3d(0, 0, 0);  // gyroscope noise root PSD, rad/s^0.5
+    Eigen::Vector3d na = Eigen::Vector3d(0, 0, 0);  // accelerometer noise root PSD, m/s^1.5
+    Eigen::Vector3d rwg = Eigen::Vector3d(0, 0, 0); // gyroscope random walk root PSD, rad/s^1.5
+    Eigen::Vector3d rwa = Eigen::Vector3d(0, 0, 0); // accelerometer random walk root PSD, m/s^2.5
+    double sample_rate = 100;                       // Hz
+
+    static ImuErrorParameter Zero(){
+      return ImuErrorParameter();
+    }
   };
 
   void imu_add_error(std::vector<ImuMeasurement6d> &imu,
