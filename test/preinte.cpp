@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-13 11:06:16
- * @LastEditTime: 2021-09-14 18:49:29
+ * @LastEditTime: 2021-09-15 09:05:34
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/preinte.cpp
@@ -99,13 +99,13 @@ void test3(){
     gyr << 0, 0, 0;
     ba << 0, 0, 0;
     bg << 0, 0, 0;
-    IntegrationBase inte(acc, gyr, ba, bg);
+    // IntegrationBase inte(acc, gyr, ba, bg);
     // PreIntegrationTerm inte(acc, gyr, ba, bg);
-    // PreIntegrationTerm(vimu0, ba, bg, imuerr);
+    PreIntegrationTerm(vimu0, ba, bg, imuerr);
     std::cout << "gogogo" << std::endl;
 }
 
 int main(){
-  test1();
+  test3();
   std::cout << "it's ok" << std::endl;
 }

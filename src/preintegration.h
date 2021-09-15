@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-13 20:11:28
- * @LastEditTime: 2021-09-14 18:33:38
+ * @LastEditTime: 2021-09-15 09:09:38
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/preintegration.h
@@ -17,6 +17,7 @@
 
 #include "parameter.h"
 #include "geometry.h"
+#include "utils.h"
 
 using namespace Eigen;
 using namespace dh;
@@ -40,12 +41,19 @@ namespace dh{
           imuerr(_imuerr)
     {
       noise = Eigen::Matrix<double, 18, 18>::Zero();
-      noise.block<3, 3>(0, 0) = (imuerr.na * imuerr.na) * Eigen::Matrix3d::Identity();
-      noise.block<3, 3>(3, 3) = (imuerr.ng  * imuerr.ng) * Eigen::Matrix3d::Identity();
-      noise.block<3, 3>(6, 6) = (imuerr.na  * imuerr.na) * Eigen::Matrix3d::Identity();
-      noise.block<3, 3>(9, 9) = (imuerr.ng  * imuerr.ng) * Eigen::Matrix3d::Identity();
-      noise.block<3, 3>(12, 12) = (imuerr.rwa  * imuerr.rwa) * Eigen::Matrix3d::Identity();
-      noise.block<3, 3>(15, 15) = (imuerr.rwg  * imuerr.rwg) * Eigen::Matrix3d::Identity();
+      // noise.block<3, 3>(0, 0) = (imuerr.na(0) * imuerr.na(0)) * Eigen::Matrix3d::Identity();
+      // noise.block<3, 3>(3, 3) = (imuerr.ng(0)  * imuerr.ng(0)) * Eigen::Matrix3d::Identity();
+      // noise.block<3, 3>(6, 6) = (imuerr.na(0)  * imuerr.na(0)) * Eigen::Matrix3d::Identity();
+      // noise.block<3, 3>(9, 9) = (imuerr.ng(0)  * imuerr.ng(0)) * Eigen::Matrix3d::Identity();
+      // noise.block<3, 3>(12, 12) = (imuerr.rwa(0)  * imuerr.rwa(0)) * Eigen::Matrix3d::Identity();
+      // noise.block<3, 3>(15, 15) = (imuerr.rwg(0)  * imuerr.rwg(0)) * Eigen::Matrix3d::Identity();
+      // noise.block<3, 3>(0, 0) = std_to_covariance<3>(imuerr.ba);
+      noise.block<3, 3>(0, 0) = std_to_covariance(imuerr.na);
+      noise.block<3, 3>(3, 3) = std_to_covariance(imuerr.ng);
+      noise.block<3, 3>(6, 6) = std_to_covariance(imuerr.na);
+      noise.block<3, 3>(9, 9) = std_to_covariance(imuerr.ng);
+      noise.block<3, 3>(12, 12) = std_to_covariance(imuerr.rwa);
+      noise.block<3, 3>(15, 15) = std_to_covariance(imuerr.rwg);
     }
 
     PreIntegrationTerm(const ImuVector &vimu,
