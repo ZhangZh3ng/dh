@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-21 11:07:33
- * @LastEditTime: 2021-09-15 09:02:57
+ * @LastEditTime: 2021-09-15 15:54:26
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/utils.hpp
@@ -12,6 +12,8 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+#include "constant.h"
 
 namespace dh{
   /**
@@ -72,9 +74,32 @@ namespace dh{
   template<int N>
   inline Eigen::Matrix<double, N, N> std_to_covariance(const Eigen::Matrix<double, N, 1>& std){
     Eigen::Matrix<double, N, N> covariance;   
+    covariance.setZero();
     for(int i = 0; i<N; ++i)
         covariance(i, i) = std(i) * std(i);
     return covariance;
+  }
+
+  /**
+   * @brief return TRUE when abs(a-b) is enouth small.
+   */
+  inline bool AlmostEqual(const double &a, const double &b){
+    // return (abs(a - b) < IF_EQUAL_THRESHHOLD);
+    return (abs(a - b) < 1e-8);
+  }
+  
+  /**
+   * @brief return TRUE when (a-b) is enouth large positive number.
+   */
+  inline bool DefinitelyGreater(const double& a, const double &b){
+    return (a > b) && !(AlmostEqual(a, b));
+  }
+
+  /**
+   * @brief return TRUE when a>b or (b-a) is enough small
+   */
+  inline bool GreaterOrAlmostEqual(const double& a, const double& b){
+    return (a > b) || AlmostEqual(a, b);
   }
 
 } // namespace dh

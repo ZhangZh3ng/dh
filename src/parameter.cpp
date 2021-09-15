@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:21:23
- * @LastEditTime: 2021-09-14 15:46:53
+ * @LastEditTime: 2021-09-15 16:29:34
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.cpp
@@ -134,8 +134,7 @@ namespace dh{
     PoseQPV p_begin, p_end;
     for (std::vector<PoseQPV>::const_iterator it_pose = pose.begin();
          it_pose+1 != pose.end();
-         ++it_pose)
-    {
+         ++it_pose){
       p_begin = *it_pose;
       p_end = *(it_pose+1);
       pose_to_imu(p_begin, p_end, imu_now);

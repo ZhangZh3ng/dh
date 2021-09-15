@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 20:29:24
- * @LastEditTime: 2021-09-13 10:12:09
+ * @LastEditTime: 2021-09-15 14:39:43
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/test_trajectory_generator.cpp
@@ -12,7 +12,7 @@
 
 #include "trajectory_generator.h"
 #include "geometry.h"
-#include "unit.h"
+#include "constant.h"
 #include "mywrite.h"
 #include "sins.h"
 

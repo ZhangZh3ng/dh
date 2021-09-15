@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-13 20:11:28
- * @LastEditTime: 2021-09-15 09:09:38
+ * @LastEditTime: 2021-09-15 19:25:56
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/preintegration.h
@@ -65,6 +65,7 @@ namespace dh{
       Eigen::Vector3d _acc, _gyr;
       new(this) PreIntegrationTerm((*it_imu).a, (*it_imu).w, _linearized_ba, _linearized_bg, _imuerr);
       this->initial_time_stamp = (*it_imu).time_stamp;
+      // this->use_mid_integration = false;
       for (++it_imu; it_imu != vimu.end(); ++it_imu)
       {
         this->push_back(*it_imu);
@@ -109,6 +110,7 @@ namespace dh{
                              Eigen::Vector3d &result_linearized_ba, Eigen::Vector3d &result_linearized_bg, bool update_jacobian)
     {
       //ROS_INFO("midpoint integration");
+      // std::cout << "use midintegration" << std::endl;
       Vector3d un_acc_0 = delta_q * (_acc_0 - linearized_ba);
       Vector3d un_gyr = 0.5 * (_gyr_0 + _gyr_1) - linearized_bg;
       result_delta_q = delta_q * Quaterniond(1, un_gyr(0) * _dt / 2, un_gyr(1) * _dt / 2, un_gyr(2) * _dt / 2);
@@ -186,10 +188,16 @@ namespace dh{
       Vector3d result_linearized_ba;
       Vector3d result_linearized_bg;
 
-      midPointIntegration(_dt, acc_0, gyr_0, _acc_1, _gyr_1, delta_p, delta_q, delta_v,
-                          linearized_ba, linearized_bg,
-                          result_delta_p, result_delta_q, result_delta_v,
-                          result_linearized_ba, result_linearized_bg, 1);
+      if(use_mid_integration)
+        midPointIntegration(_dt, acc_0, gyr_0, _acc_1, _gyr_1, delta_p, delta_q, delta_v,
+                            linearized_ba, linearized_bg,
+                            result_delta_p, result_delta_q, result_delta_v,
+                            result_linearized_ba, result_linearized_bg, 1);
+      else
+        eulerIntegration(_dt, acc_0, gyr_0, _acc_1, _gyr_1, delta_p, delta_q, delta_v,
+                         linearized_ba, linearized_bg,
+                         result_delta_p, result_delta_q, result_delta_v,
+                         result_linearized_ba, result_linearized_bg, 1);
 
       //checkJacobian(_dt, acc_0, gyr_0, acc_1, gyr_1, delta_p, delta_q, delta_v,
       //                    linearized_ba, linearized_bg);
@@ -263,7 +271,75 @@ namespace dh{
 
     double initial_time_stamp = 0;
     ImuErrorParameter imuerr;
-    Eigen::Vector3d G;
+    const Eigen::Vector3d G = Eigen::Vector3d(0, 0, 9.8);
+    bool use_mid_integration = true;
+
+    void eulerIntegration(double _dt,
+                          const Eigen::Vector3d &_acc_0, const Eigen::Vector3d &_gyr_0,
+                          const Eigen::Vector3d &_acc_1, const Eigen::Vector3d &_gyr_1,
+                          const Eigen::Vector3d &delta_p, const Eigen::Quaterniond &delta_q, const Eigen::Vector3d &delta_v,
+                          const Eigen::Vector3d &linearized_ba, const Eigen::Vector3d &linearized_bg,
+                          Eigen::Vector3d &result_delta_p, Eigen::Quaterniond &result_delta_q, Eigen::Vector3d &result_delta_v,
+                          Eigen::Vector3d &result_linearized_ba, Eigen::Vector3d &result_linearized_bg, bool update_jacobian)
+    {
+      // std::cout << "use eulerintegration" << std::endl;
+        result_delta_p = delta_p + delta_v * _dt + 0.5 * (delta_q * (_acc_1 - linearized_ba)) * _dt * _dt;
+        result_delta_v = delta_v + delta_q * (_acc_1 - linearized_ba) * _dt;
+        Vector3d omg = _gyr_1 - linearized_bg;
+        omg = omg * _dt / 2;
+        Quaterniond dR(1, omg(0), omg(1), omg(2));
+        result_delta_q = (delta_q * dR);   
+        result_linearized_ba = linearized_ba;
+        result_linearized_bg = linearized_bg;         
+
+        if(update_jacobian)
+        {
+            Vector3d w_x = _gyr_1 - linearized_bg;
+            Vector3d a_x = _acc_1 - linearized_ba;
+            Matrix3d R_w_x, R_a_x;
+
+            R_w_x<<0, -w_x(2), w_x(1),
+                w_x(2), 0, -w_x(0),
+                -w_x(1), w_x(0), 0;
+            R_a_x<<0, -a_x(2), a_x(1),
+                a_x(2), 0, -a_x(0),
+                -a_x(1), a_x(0), 0;
+
+            MatrixXd A = MatrixXd::Zero(15, 15);
+            // one step euler 0.5
+            A.block<3, 3>(0, 3) = 0.5 * (-1 * delta_q.toRotationMatrix()) * R_a_x * _dt;
+            A.block<3, 3>(0, 6) = MatrixXd::Identity(3,3);
+            A.block<3, 3>(0, 9) = 0.5 * (-1 * delta_q.toRotationMatrix()) * _dt;
+            A.block<3, 3>(3, 3) = -R_w_x;
+            A.block<3, 3>(3, 12) = -1 * MatrixXd::Identity(3,3);
+            A.block<3, 3>(6, 3) = (-1 * delta_q.toRotationMatrix()) * R_a_x;
+            A.block<3, 3>(6, 9) = (-1 * delta_q.toRotationMatrix());
+            //cout<<"A"<<endl<<A<<endl;
+
+            MatrixXd U = MatrixXd::Zero(15,12);
+            U.block<3, 3>(0, 0) =  0.5 * delta_q.toRotationMatrix() * _dt;
+            U.block<3, 3>(3, 3) =  MatrixXd::Identity(3,3);
+            U.block<3, 3>(6, 0) =  delta_q.toRotationMatrix();
+            U.block<3, 3>(9, 6) = MatrixXd::Identity(3,3);
+            U.block<3, 3>(12, 9) = MatrixXd::Identity(3,3);
+
+            // put outside
+            Eigen::Matrix<double, 12, 12> noise = Eigen::Matrix<double, 12, 12>::Zero();
+            noise.block<3, 3>(0, 0) =  (ACC_N * ACC_N) * Eigen::Matrix3d::Identity();
+            noise.block<3, 3>(3, 3) =  (GYR_N * GYR_N) * Eigen::Matrix3d::Identity();
+            noise.block<3, 3>(6, 6) =  (ACC_W * ACC_W) * Eigen::Matrix3d::Identity();
+            noise.block<3, 3>(9, 9) =  (GYR_W * GYR_W) * Eigen::Matrix3d::Identity();
+
+            //write F directly
+            MatrixXd F, V;
+            F = (MatrixXd::Identity(15,15) + _dt * A);
+            V = _dt * U;
+            step_jacobian = F;
+            step_V = V;
+            jacobian = F * jacobian;
+            covariance = F * covariance * F.transpose() + V * noise * V.transpose();
+        }
+    }     
   };
 }
 

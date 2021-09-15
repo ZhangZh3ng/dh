@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:57:19
- * @LastEditTime: 2021-09-11 10:47:21
+ * @LastEditTime: 2021-09-15 15:45:16
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.cpp
@@ -51,14 +51,11 @@ namespace dh{
     
     w << 0, 0, 0;
     a << 0, 0, 0;
-
-    double threshhold = 1e-8;
     for(std::vector<Motion3d>::const_iterator it = this->motions.begin();
         it != this->motions.end();
-        it++)
-    {
-      if ( ((*it).begin_time - time_stamp) <  threshhold
-           && ((*it).end_time - time_stamp) > threshhold )
+        it++){
+      if ( GreaterOrAlmostEqual(time_stamp, (*it).begin_time)
+          && DefinitelyGreater((*it).end_time, time_stamp))
       {
         w(0) += (*it).wy;
         w(1) += (*it).wp;

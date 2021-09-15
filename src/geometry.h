@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-02 20:13:13
- * @LastEditTime: 2021-09-13 09:49:10
+ * @LastEditTime: 2021-09-15 09:40:19
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/geometry.h
@@ -71,7 +71,7 @@ namespace dh{
   *                 zyx eluer angle -> quaternion, dcm                       *
   ***************************************************************************/
 
-  Eigen::Matrix<double, 3, 3> zxy_euler_angle_to_dcm(const Eigen::Vector3d rxyz){
+  inline Eigen::Matrix<double, 3, 3> zxy_euler_angle_to_dcm(const Eigen::Vector3d rxyz){
     Eigen::Matrix3d dcm;
     dcm = euler_angle_to_dcm(rxyz(2), rxyz(0), rxyz(1),
                              RotationAxis::Z, 
@@ -107,7 +107,7 @@ namespace dh{
   *                 zyx eluer angle -> quaternion, dcm                       *
   ***************************************************************************/
 
-  Eigen::Matrix3d zyx_euler_angle_to_dcm(const Eigen::Vector3d rxyz){
+  inline Eigen::Matrix3d zyx_euler_angle_to_dcm(const Eigen::Vector3d rxyz){
     Eigen::Matrix3d dcm;
     dcm = euler_angle_to_dcm(rxyz(2), rxyz(1), rxyz(0),
                              RotationAxis::Z,

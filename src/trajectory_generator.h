@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:53:13
- * @LastEditTime: 2021-09-13 10:10:59
+ * @LastEditTime: 2021-09-15 15:20:01
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.h
@@ -22,6 +22,7 @@
 
 #include "type.h"
 #include "parameter.h"
+#include "utils.h"
 
 namespace dh{
   
@@ -31,12 +32,12 @@ namespace dh{
     friend std::ostream &operator<<(std::ostream &os, const Motion3d &motion);
     friend class Trajectory3d;
 
-    Motion3d(const double val_begin_time, const double val_end_time,
-             const double val_wy, const double val_wp, const double val_wr,
-             const double val_ax, const double val_ay, const double val_az)
-        : begin_time(val_begin_time), end_time(val_end_time),
-          wy(val_wy), wp(val_wp), wr(val_wr),
-          ax(val_ax), ay(val_ay), az(val_az) {}
+    Motion3d(const double _begin_time, const double _end_time,
+             const double _wy, const double _wp, const double _wr,
+             const double _ax, const double _ay, const double _az)
+        : begin_time(_begin_time), end_time(_end_time),
+          wy(_wy), wp(_wp), wr(_wr),
+          ax(_ax), ay(_ay), az(_az) {}
 
     static int size() { return 8; }
     double getEndTime() const { return this->end_time; }
@@ -87,11 +88,9 @@ namespace dh{
 
     void briefReport() const;
 
-  private:
     std::vector<Motion3d> motions;
     int num_motions = 0;
     double total_time = 0;
-    // LocalNavigationParameter initial_parameter;
   };
 
   template <class NpType>
@@ -105,7 +104,7 @@ namespace dh{
     Eigen::Vector3d w, a;
     vnp.push_back(np);
 
-    while(np.time_stamp < trajectory.total_time){
+    while(!DefinitelyGreater(np.time_stamp, trajectory.total_time)){
       trajectory.getAngleVelocityAndAcceleration(w, a, np.time_stamp);
       np.update(w, a, dt);
       vnp.push_back(np);
