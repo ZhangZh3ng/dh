@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-02 20:13:13
- * @LastEditTime: 2021-09-15 09:40:19
+ * @LastEditTime: 2021-09-16 19:18:04
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/geometry.h
@@ -254,13 +254,12 @@ namespace dh{
   inline Eigen::Quaterniond rot_to_quat(const Eigen::Vector3d rot){
     double w, x, y, z;
     const double norm_rot = rot.norm();
-    const double sin_half_norm_rot = std::sin(norm_rot / 2);
-    w = std::cos(norm_rot / 2);
+    const double sin_half_norm_rot = sin(norm_rot / 2);
+    w = cos(norm_rot / 2);
     x = rot(0) / norm_rot * sin_half_norm_rot;
     y = rot(1) / norm_rot * sin_half_norm_rot;
     z = rot(2) / norm_rot * sin_half_norm_rot;
-    Eigen::Quaterniond q = Eigen::Quaterniond(w, x, y, z);
-    return q;
+    return Eigen::Quaterniond(w, x, y, z);
   }
 
   inline Eigen::Quaterniond quat_add_rot(const Eigen::Quaterniond &q,
@@ -268,9 +267,9 @@ namespace dh{
   {
     Eigen::Quaterniond qout;
     const double norm_rot = rot.norm();
-    const double sin_half_norm_rot = std::sin(norm_rot / 2);
+    const double sin_half_norm_rot = sin(norm_rot / 2);
     double w, x, y, z;
-    w = std::cos(norm_rot / 2);
+    w = cos(norm_rot / 2);
     x = rot(0) / norm_rot * sin_half_norm_rot;
     y = rot(1) / norm_rot * sin_half_norm_rot;
     z = rot(2) / norm_rot * sin_half_norm_rot;

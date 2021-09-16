@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:04:02
- * @LastEditTime: 2021-09-13 19:40:23
+ * @LastEditTime: 2021-09-16 19:58:00
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/io.h
@@ -15,7 +15,7 @@
 #include <fstream>
 #include <vector>
 
-#include "parameter.h"
+#include "navigation_parameter.h"
 #include "ceres_example_slam/pose_graph_3d/types.h"
 
 

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:53:13
- * @LastEditTime: 2021-09-15 15:20:01
+ * @LastEditTime: 2021-09-16 21:23:16
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.h
@@ -21,7 +21,8 @@
 #include <Eigen/Geometry>
 
 #include "type.h"
-#include "parameter.h"
+#include "navigation_parameter.h"
+#include "imu_parameter.h"
 #include "utils.h"
 
 namespace dh{

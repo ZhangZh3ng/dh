@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-07 10:02:48
- * @LastEditTime: 2021-09-15 14:38:52
+ * @LastEditTime: 2021-09-16 19:19:16
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/sins.hpp
@@ -23,16 +23,16 @@ using namespace dh;
 namespace dh{
 
 /**
- * @brief Return the radii of earth at latitude = lat and altitude = alt.
+ * @brief Return the radii of earth at lat.
  * 
  * @param lat Latitude in redian.
- * @return Eigen::Matrix<double, 2, 1> The former is north-sounth radius, the latter is east-west radius.
+ * @return Eigen::Vector2d The former is north-sounth radius, the latter is east-west radius.
  */
   inline Eigen::Matrix<double, 2, 1> earth_radii(const double &lat)
   {
     Eigen::Matrix<double, 2, 1> R;
-    R(0) = C_Re * (1 - C_e2) / std::pow((1 - C_e2 * std::sin(lat) * std::sin(lat)), 1.5);
-    R(1) = C_Re / (pow(1 - C_e2 * std::sin(lat) * std::sin(lat), 0.5));
+    R(0) = C_Re * (1 - C_e2) / pow((1 - C_e2 * sin(lat) * sin(lat)), 1.5);
+    R(1) = C_Re / (pow(1 - C_e2 * sin(lat) * sin(lat), 0.5));
     return R;
   }
 
@@ -41,14 +41,13 @@ namespace dh{
  * 
  * @param lat Latitude in radian.
  * @param alt Altitude in meter.
- * @return Eigen::Matrix<double, 3, 1> 
  */
   inline Eigen::Matrix<double, 3, 1> gravity_in_enu(const double &lat, const double &alt)
   {
       Eigen::Matrix<double, 3, 1> g;
       g(0) = 0;
-      g(1) = -8.08e-9 * alt * std::sin(2 * lat);
-      g(2) = -9.7803253359 * (1 + 0.0053024 * std::pow(std::sin(lat), 2) - 0.00000582 * std::pow(std::sin(2 * lat), 2)) - 3.08e-6 * alt;
+      g(1) = -8.08e-9 * alt * sin(2 * lat);
+      g(2) = -9.7803253359 * (1 + 0.0053024 * pow(sin(lat), 2) - 0.00000582 * pow(sin(2 * lat), 2)) - 3.08e-6 * alt;
       return g;
   }
 
@@ -56,14 +55,13 @@ namespace dh{
  * @brief Return the projection of earth rate in East-North-Up frame.
  * 
  * @param lat Latitude in radian.
- * @return Eigen::Matrix<double, 3, 1> 
  */
   inline Eigen::Matrix<double, 3, 1> wie_in_enu(const double &lat)
   {
       Eigen::Matrix<double, 3, 1> w_ie_n;
       w_ie_n(0) = 0;
-      w_ie_n(1) = C_wie * std::cos(lat);
-      w_ie_n(2) = C_wie * std::sin(lat);
+      w_ie_n(1) = C_wie * cos(lat);
+      w_ie_n(2) = C_wie * sin(lat);
       return w_ie_n;
   }
 
@@ -74,7 +72,6 @@ namespace dh{
  * @param alt Altitude in meter.
  * @param ve East velocity in m/s.
  * @param vn North velocity in m/s.
- * @return Eigen::Matrix<double, 3, 1> 
  */
   inline Eigen::Matrix<double, 3, 1> wen_in_enu(const double &lat, const double &alt, const double &ve, const double &vn)
   {
@@ -83,7 +80,7 @@ namespace dh{
       Rmn = earth_radii(lat);
       w_en_n(0) = -vn / (Rmn(0) + alt);
       w_en_n(1) = ve / (Rmn(1) + alt);
-      w_en_n(2) = ve / (Rmn(1) + alt) * std::tan(lat);
+      w_en_n(2) = ve / (Rmn(1) + alt) * tan(lat);
       return w_en_n;
   }
 
@@ -94,7 +91,6 @@ namespace dh{
  * @param alt Altitude in meter.
  * @param ve East velocity in m/s.
  * @param vn North velocity in m/s.
- * @return Eigen::Matrix<double, 3, 1> 
  */
   inline Eigen::Matrix<double, 3, 1> win_in_enu(const double &lat, const double &alt, const double &ve, const double &vn)
   {
@@ -108,13 +104,12 @@ namespace dh{
    * 
    * @param lat Latitude in radian.
    * @param alt Altitude in meter.
-   * @return Eigen::Matrix<double, 3 ,3> 
    */
   inline Eigen::Matrix<double, 3, 3> sins_Mpv_enu(const double &lat, const double &alt)
   {
     Eigen::Matrix<double, 3, 3> mat;
     Eigen::Matrix<double, 2, 1> Rmn = earth_radii(lat);
-    mat << 0, 1 / (Rmn(0) + alt), 0, 1 / std::cos(lat) / (Rmn(1) + alt), 0, 0, 0, 0, 1;
+    mat << 0, 1 / (Rmn(0) + alt), 0, 1 / cos(lat) / (Rmn(1) + alt), 0, 0, 0, 0, 1;
     return mat;
   }
 
@@ -130,7 +125,7 @@ namespace dh{
     // imu output time interval.
     double time_length_ = 0.01;
 
-    SinsInEnuReferenceFrame(const Eigen::Quaterniond q, const Eigen::Vector3d vn, const Eigen::Vector3d lla, const double time_length = 0.01) : q_(q), vn_(vn), lla_(lla), time_length_(time_length) {}
+    SinsInEnuReferenceFrame(const Eigen::Quaterniond _q, const Eigen::Vector3d _vn, const Eigen::Vector3d _lla, const double _time_length = 0.01) : q_(_q), vn_(_vn), lla_(_lla), time_length_(_time_length) {}
 
     /**
       * @brief update with angular velocity and acceleration.
@@ -139,7 +134,7 @@ namespace dh{
       */
     void update(const Eigen::Vector3d w_ib_b, const Eigen::Vector3d f_ib_b)
     {
-      const double t = this->time_length_;
+      const double dt = this->time_length_;
       const Eigen::Quaterniond q_b_n_0 = this->q_;
       const Eigen::Vector3d v_eb_n_0 = this->vn_;
       const double lat0 = this->lla_(0);
@@ -148,20 +143,20 @@ namespace dh{
       const Eigen::Vector3d lla0 = this->lla_;
 
       // attitude update
-      Eigen::Quaterniond q_bt_b0 = rot_to_quat(w_ib_b * t);
+      Eigen::Quaterniond q_bt_b0 = rot_to_quat(w_ib_b * dt);
       Eigen::Vector3d w_in_n;
       w_in_n << 0, 0, 0;
-      Eigen::Quaterniond q_n0_nt = rot_to_quat(w_in_n * t);
+      Eigen::Quaterniond q_n0_nt = rot_to_quat(w_in_n * dt);
       Eigen::Quaterniond q_b_n = q_n0_nt * q_b_n_0 * q_bt_b0;
       this->q_ = q_b_n;
 
       // velocity update
-      Eigen::Vector3d f_ib_n = (q_b_n_0 * f_ib_b + q_b_n * f_ib_b) * t / 2;
-      Eigen::Vector3d v_eb_n = v_eb_n_0 + (f_ib_n - gravity_in_enu(lat0, alt0)) * t;
+      Eigen::Vector3d f_ib_n = (q_b_n_0 * f_ib_b + q_b_n * f_ib_b) * dt / 2;
+      Eigen::Vector3d v_eb_n = v_eb_n_0 + (f_ib_n - gravity_in_enu(lat0, alt0)) * dt;
       this->vn_ = v_eb_n;
 
       // position update
-      Eigen::Vector3d lla = lla0 + sins_Mpv_enu(lat0, alt0) * (v_eb_n + v_eb_n_0) * t / 2;
+      Eigen::Vector3d lla = lla0 + sins_Mpv_enu(lat0, alt0) * (v_eb_n + v_eb_n_0) * dt / 2;
       this->lla_ = lla;
     }
   };
@@ -169,11 +164,9 @@ namespace dh{
   /**
    * @brief convert ecef coordinate to latitude longitude altitude.
    * 
-   * @param ecef 
-   * @return Eigen::Vector3d 
+   * @param ecef ecef x,y,z coordinate.
    */
   inline Eigen::Vector3d ecef_to_lla(const Eigen::Vector3d& ecef){
-    Eigen::Vector3d lla;
     double x, y, z, lat, lon, alt;
     x = ecef(0);
     y = ecef(1);
@@ -194,18 +187,15 @@ namespace dh{
     // altitude:
     double Rn = C_Re / sqrt(1 - C_e2 * pow(sin(lat), 2));
     alt = sqrt(x * x + y * y) / cos(lat) - Rn;
-    lla << lat, lon, alt;
-    return lla;
+    return Eigen::Vector3d(lat, lon, alt);
   }
 
   /**
    * @brief convert latitude, longitude, altitude to ecef coordinate.
    * 
    * @param lla latitude(rad) longitude(rad) altitude(m)
-   * @return Eigen::Vector3d 
    */
   inline Eigen::Vector3d lla_to_ecef(const Eigen::Vector3d& lla){
-    Eigen::Vector3d ecef;
     double lat, lon, alt, x, y, z;
     lat = lla(0);
     lon = lla(1);
@@ -214,8 +204,7 @@ namespace dh{
     x = (Rn + alt) * cos(lat) * cos(lon);
     y = (Rn + alt) * cos(lat) * sin(lon);
     z = (Rn * (1 - C_e2) + alt) * sin(lat);
-    ecef << x, y, z;
-    return ecef;
+    return Eigen::Vector3d(x, y, z);
   }
 
 } // namespace dh
