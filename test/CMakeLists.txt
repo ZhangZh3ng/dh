@@ -7,8 +7,11 @@
 # target_link_libraries(opt1 ${CERES_LIBRARIES})
 # target_link_libraries(opt2 ${CERES_LIBRARIES})
 
-add_executable(t_tg test_trajectory_generator.cpp)
-target_link_libraries(t_tg dh)
+# add_executable(t_tg test_trajectory_generator.cpp)
+# target_link_libraries(t_tg dh)
 
-add_executable(preinte preinte.cpp)
-target_link_libraries(preinte dh vinsmono)
+# add_executable(preinte preinte.cpp)
+# target_link_libraries(preinte dh vinsmono)
+
+add_executable(sins sinsprocessor.cpp)
+target_link_libraries(sins dh vinsmono)

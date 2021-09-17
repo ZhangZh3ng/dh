@@ -40,7 +40,7 @@ include_directories("/usr/include/eigen3")
 
 include_directories(./)
 
-set(GFLAGS true)
+# set(GFLAGS true)
 
 add_subdirectory(pose_graph_2d)
 add_subdirectory(pose_graph_3d)

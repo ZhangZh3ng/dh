@@ -71,7 +71,26 @@
         "csetjmp": "cpp",
         "unordered_set": "cpp",
         "scoped_allocator": "cpp",
-        "*.txx": "cpp"
+        "*.txx": "cpp",
+        "cholesky": "cpp",
+        "eigenvalues": "cpp",
+        "geometry": "cpp",
+        "householder": "cpp",
+        "iterativelinearsolvers": "cpp",
+        "jacobi": "cpp",
+        "lu": "cpp",
+        "orderingmethods": "cpp",
+        "qr": "cpp",
+        "svd": "cpp",
+        "sparse": "cpp",
+        "sparsecholesky": "cpp",
+        "sparsecore": "cpp",
+        "sparselu": "cpp",
+        "sparseqr": "cpp",
+        "stdvector": "cpp",
+        "tensor": "cpp",
+        "threadpool": "cpp",
+        "specialfunctions": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:08:03
- * @LastEditTime: 2021-09-16 21:25:04
+ * @LastEditTime: 2021-09-17 14:26:05
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.h
@@ -19,6 +19,7 @@
 #include "ceres_example_slam/pose_graph_3d/types.h"
 #include "type.h"
 #include "geometry.h"
+#include "utils.h"
 
 
 using namespace ceres::examples;
@@ -54,32 +55,40 @@ namespace dh{
           px(pxyz(0)), py(pxyz(1)), pz(pxyz(2)), time_stamp(_time_stamp),
           euler_angle_type(euler_type) {}
 
-    virtual void update(const double &wy, const double &wp, const double &wr,
+    virtual void propogate(const double &wy, const double &wp, const double &wr,
                         const double &ax, const double &ay, const double &az,
                         const double &dt);
 
-    virtual void update(const Eigen::Vector3d &w,
+    virtual void propogate(const Eigen::Vector3d &w,
                         const Eigen::Vector3d &a,
                         const double &dt);
 
     Eigen::Quaterniond q() const {return ypr_to_quat(yaw, pitch, roll, euler_angle_type);}
-    Eigen::Vector3d v() const {return Eigen::Vector3d(vx, vy, vz);}
+    Eigen::Vector3d vb() const {return Eigen::Vector3d(vx, vy, vz);}
+    Eigen::Vector3d vn() const {return this->q()*this->vb(); }
     Eigen::Vector3d p() const {return Eigen::Vector3d(px, py, pz);}
     Eigen::Vector3d ypr() const {return Eigen::Vector3d(yaw, pitch, roll);}
     Eigen::Matrix3d dcm() const {return ypr_to_dcm(yaw, pitch, roll, euler_angle_type);}
 
     virtual std::string name(){ return "Np"; }
 
+    static LocalNavigationParameter Zero(){
+      return LocalNavigationParameter(Eigen::Vector3d::Zero(),
+                                      Eigen::Vector3d::Zero(),
+                                      Eigen::Vector3d::Zero(),
+                                      0, EulerAngleType::ZXY);
+    }
+
     double time_stamp = 0;
-    double yaw;
-    double pitch;
-    double roll;
-    double vx;
-    double vy;
-    double vz;
-    double px;
-    double py;
-    double pz;
+    double yaw;   // body frame w.r.t world frame, in rad
+    double pitch; // body frame w.r.t world frame, in rad
+    double roll;  // body frame w.r.t world frame, in rad
+    double vx;    // w.r.t body frame, in m/s^2
+    double vy;    // w.r.t body frame, in m/s^2
+    double vz;    // w.r.t body frame, in m/s^2
+    double px;    // in world frame, in m
+    double py;    // in world frame, in m
+    double pz;    // in world frame, in m
     EulerAngleType euler_angle_type;
   };
 
@@ -89,6 +98,29 @@ namespace dh{
        << " " << np.vx << " " << np.vy << " " << np.vz
        << " " << np.px << " " << np.py << " " << np.pz;
     return os;
+  }
+
+  inline LocalNavigationParameter operator-(
+      const LocalNavigationParameter &a,
+      const LocalNavigationParameter &b)
+  {
+    LocalNavigationParameter diff = LocalNavigationParameter::Zero();
+    if(a.euler_angle_type != b.euler_angle_type || !AlmostEqual(a.time_stamp, b.time_stamp)) 
+      throw 1;
+
+    diff.time_stamp = a.time_stamp;
+    diff.euler_angle_type = a.euler_angle_type;
+    diff.yaw = a.yaw - b.yaw;
+    diff.pitch = a.pitch - b.pitch;
+    diff.roll = a.roll - b.roll;
+    diff.vx = a.vx - b.vx;
+    diff.vy = a.vy - b.vy;
+    diff.vz = a.vz - b.vz;
+    diff.px = a.px - b.px;
+    diff.py = a.py - b.py;
+    diff.pz = a.pz - b.pz;
+
+    return diff;
   }
 
   /***************************************************************************
@@ -104,7 +136,7 @@ namespace dh{
     PoseQPV(const Eigen::Quaterniond &_q, const Eigen::Vector3d &_p,
             const Eigen::Vector3d &_v, const double &_time_stamp = 0) : q(_q), p(_p), v(_v), time_stamp(_time_stamp) {}
 
-    void updateByAcc(const Eigen::Vector3d &w, const Eigen::Vector3d&a, const double &dt);
+    void propogate(const Eigen::Vector3d &w, const Eigen::Vector3d&a, const double &dt);
     std::string name() const {return "PoseQPV";}
 
     Eigen::Quaterniond q = Eigen::Quaterniond::Identity();

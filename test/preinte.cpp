@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-13 11:06:16
- * @LastEditTime: 2021-09-16 21:23:01
+ * @LastEditTime: 2021-09-17 14:46:01
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/preinte.cpp
@@ -18,7 +18,7 @@
 #include "trajectory_generator.h"
 #include "constant.h"
 #include "mywrite.h"
-#include "myio.h"
+#include "common_operator.h"
 #include "preintegration.h"
 
 
