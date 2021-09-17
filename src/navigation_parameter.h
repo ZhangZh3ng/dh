@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:08:03
- * @LastEditTime: 2021-09-17 14:26:05
+ * @LastEditTime: 2021-09-17 15:34:35
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.h
@@ -55,11 +55,11 @@ namespace dh{
           px(pxyz(0)), py(pxyz(1)), pz(pxyz(2)), time_stamp(_time_stamp),
           euler_angle_type(euler_type) {}
 
-    virtual void propogate(const double &wy, const double &wp, const double &wr,
+    virtual void propagate(const double &wy, const double &wp, const double &wr,
                         const double &ax, const double &ay, const double &az,
                         const double &dt);
 
-    virtual void propogate(const Eigen::Vector3d &w,
+    virtual void propagate(const Eigen::Vector3d &w,
                         const Eigen::Vector3d &a,
                         const double &dt);
 
@@ -136,7 +136,7 @@ namespace dh{
     PoseQPV(const Eigen::Quaterniond &_q, const Eigen::Vector3d &_p,
             const Eigen::Vector3d &_v, const double &_time_stamp = 0) : q(_q), p(_p), v(_v), time_stamp(_time_stamp) {}
 
-    void propogate(const Eigen::Vector3d &w, const Eigen::Vector3d&a, const double &dt);
+    void propagate(const Eigen::Vector3d &w, const Eigen::Vector3d&a, const double &dt);
     std::string name() const {return "PoseQPV";}
 
     Eigen::Quaterniond q = Eigen::Quaterniond::Identity();

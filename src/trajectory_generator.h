@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:53:13
- * @LastEditTime: 2021-09-17 11:00:54
+ * @LastEditTime: 2021-09-17 16:51:57
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/trajectory_generator.h
@@ -107,7 +107,7 @@ namespace dh{
 
     while(!DefinitelyGreater(np.time_stamp, trajectory.total_time)){
       trajectory.getAngleVelocityAndAcceleration(w, a, np.time_stamp);
-      np.propogate(w, a, dt);
+      np.propagate(w, a, dt);
       vnp.push_back(np);
     }
     return true;

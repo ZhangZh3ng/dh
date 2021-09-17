@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:21:23
- * @LastEditTime: 2021-09-17 14:24:42
+ * @LastEditTime: 2021-09-17 15:34:41
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.cpp
@@ -15,7 +15,7 @@ using namespace dh;
 
 namespace dh{
 
-  void LocalNavigationParameter::propogate(
+  void LocalNavigationParameter::propagate(
       const double &wy, const double &wp, const double &wr,
       const double &ax, const double &ay, const double &az,
       const double &dt)
@@ -45,14 +45,14 @@ namespace dh{
     this->time_stamp += dt;
   }
 
-  void LocalNavigationParameter::propogate(const Eigen::Vector3d &w,
+  void LocalNavigationParameter::propagate(const Eigen::Vector3d &w,
                                            const Eigen::Vector3d &a,
                                            const double &dt)
   {
-    this->propogate(w(0), w(1), w(2), a(0), a(1), a(2), dt);
+    this->propagate(w(0), w(1), w(2), a(0), a(1), a(2), dt);
   }
 
-  void PoseQPV::propogate(const Eigen::Vector3d &w,
+  void PoseQPV::propagate(const Eigen::Vector3d &w,
                                const Eigen::Vector3d &a,
                                const double &dt)
   {

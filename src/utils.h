@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-21 11:07:33
- * @LastEditTime: 2021-09-15 15:54:26
+ * @LastEditTime: 2021-09-17 15:47:46
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/utils.hpp
@@ -81,25 +81,30 @@ namespace dh{
   }
 
   /**
-   * @brief return TRUE when abs(a-b) is enouth small.
+   * @brief return TRUE when absolute value of (a-b) is small than the threshhold.
    */
-  inline bool AlmostEqual(const double &a, const double &b){
-    // return (abs(a - b) < IF_EQUAL_THRESHHOLD);
-    return (abs(a - b) < 1e-8);
+  inline bool AlmostEqual(const double &a,
+   const double &b,
+   const double &threshhold = 1e-8){
+    return (abs(a - b) < threshhold);
   }
   
   /**
-   * @brief return TRUE when (a-b) is enouth large positive number.
+   * @brief return TRUE when (a-b) is larger than the threshhold.
    */
-  inline bool DefinitelyGreater(const double& a, const double &b){
-    return (a > b) && !(AlmostEqual(a, b));
+  inline bool DefinitelyGreater(const double& a,
+   const double &b,
+   const double &threshhold = 1e-8){
+    return (a > b) && !(AlmostEqual(a, b, threshhold));
   }
 
   /**
    * @brief return TRUE when a>b or (b-a) is enough small
    */
-  inline bool GreaterOrAlmostEqual(const double& a, const double& b){
-    return (a > b) || AlmostEqual(a, b);
+  inline bool GreaterOrAlmostEqual(const double& a,
+   const double& b,
+   const double &threshhold = 1e-8){
+    return (a > b) || AlmostEqual(a, b, threshhold);
   }
 
 } // namespace dh

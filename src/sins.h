@@ -1,7 +1,7 @@
 /*
  * @Author: Zhang Zheng
  * @Date: 2021-08-07 10:02:48
- * @LastEditTime: 2021-09-16 19:19:16
+ * @LastEditTime: 2021-09-17 15:32:02
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/sins.hpp
@@ -132,7 +132,7 @@ namespace dh{
       * @param w_ib_b angular velocity measured by gyroscope, unit is rad/s.
       * @param f_ib_b acceleration measured by accelerometer, unit is m/s^2.
       */
-    void update(const Eigen::Vector3d w_ib_b, const Eigen::Vector3d f_ib_b)
+    void update(const Eigen::Vector3d& w_ib_b, const Eigen::Vector3d& f_ib_b)
     {
       const double dt = this->time_length_;
       const Eigen::Quaterniond q_b_n_0 = this->q_;
