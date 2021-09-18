@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:08:03
- * @LastEditTime: 2021-09-17 15:34:35
+ * @LastEditTime: 2021-09-18 10:21:10
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/parameter.h
@@ -80,15 +80,15 @@ namespace dh{
     }
 
     double time_stamp = 0;
-    double yaw;   // body frame w.r.t world frame, in rad
-    double pitch; // body frame w.r.t world frame, in rad
-    double roll;  // body frame w.r.t world frame, in rad
-    double vx;    // w.r.t body frame, in m/s^2
-    double vy;    // w.r.t body frame, in m/s^2
-    double vz;    // w.r.t body frame, in m/s^2
-    double px;    // in world frame, in m
-    double py;    // in world frame, in m
-    double pz;    // in world frame, in m
+    double yaw;   // body frame w.r.t world frame. (rad)
+    double pitch; // body frame w.r.t world frame. (rad)
+    double roll;  // body frame w.r.t world frame. (rad)
+    double vx;    // w.r.t body frame. (m/s^2)
+    double vy;    // w.r.t body frame. (m/s^2)
+    double vz;    // w.r.t body frame. (m/s^2)
+    double px;    // in world frame. (m)
+    double py;    // in world frame. (m)
+    double pz;    // in world frame. (m)
     EulerAngleType euler_angle_type;
   };
 

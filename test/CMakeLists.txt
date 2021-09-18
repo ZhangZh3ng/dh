@@ -14,4 +14,4 @@
 # target_link_libraries(preinte dh vinsmono)
 
 add_executable(sins sinsprocessor.cpp)
-target_link_libraries(sins dh vinsmono)
+target_link_libraries(sins dh vinsmono ${CERES_LIBRARIES})
