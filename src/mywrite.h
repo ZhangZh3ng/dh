@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:04:02
- * @LastEditTime: 2021-09-16 19:58:00
+ * @LastEditTime: 2021-09-19 15:11:03
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/io.h
@@ -51,6 +51,14 @@ namespace dh{
     }
     outfile.close();
     return true;
+  }
+
+  template<typename T>
+  void coutArray(const T& arr){
+    for(int i = 0; i < sizeof(arr)/ sizeof(arr[0]); ++i){
+      std::cout << arr[i] << " ";
+    }
+    std::cout << std::endl;
   }
 } // namespace dh
 

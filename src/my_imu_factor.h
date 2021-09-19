@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-17 16:46:45
- * @LastEditTime: 2021-09-17 16:50:21
+ * @LastEditTime: 2021-09-19 15:02:32
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/my_imu_factor.h
@@ -187,7 +187,7 @@ namespace dh{
         return true;
     }
 
-    //bool Evaluate_Direct(double const *const *parameters, Eigen::Matrix<double, 15, 1> &residuals, Eigen::Matrix<double, 15, 30> &jacobians);
+    // bool Evaluate_Direct(double const *const *parameters, Eigen::Matrix<double, 15, 1> &residuals, Eigen::Matrix<double, 15, 30> &jacobians);
 
     //void checkCorrection();
     //void checkTransition();

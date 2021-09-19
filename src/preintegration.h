@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-13 20:11:28
- * @LastEditTime: 2021-09-16 19:58:09
+ * @LastEditTime: 2021-09-19 15:27:59
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/preintegration.h
@@ -249,13 +249,34 @@ namespace dh{
       return residuals;
     }
 
+    Eigen::Matrix<double, 15, 1> Evaluate(const Eigen::Vector3d &Pi, const Eigen::Quaterniond &Qi, const Eigen::Vector3d &Vi, const Eigen::Vector3d &Bai, const Eigen::Vector3d &Bgi,
+                                          const Eigen::Vector3d &Pj, const Eigen::Quaterniond &Qj, const Eigen::Vector3d &Vj, const Eigen::Vector3d &Baj, const Eigen::Vector3d &Bgj){
+      return this->evaluate(Pi, Qi, Vi, Bai, Bgi, Pj, Qj, Vj, Baj, Bgj);                                        
+    }
+
+    Eigen::Matrix<double, 15, 1> evaluate(double const *const *parameters){
+      Eigen::Vector3d Pi(parameters[0][0], parameters[0][1], parameters[0][2]);
+      Eigen::Quaterniond Qi(parameters[0][6], parameters[0][3], parameters[0][4], parameters[0][5]);
+
+      Eigen::Vector3d Vi(parameters[1][0], parameters[1][1], parameters[1][2]);
+      Eigen::Vector3d Bai(parameters[1][3], parameters[1][4], parameters[1][5]);
+      Eigen::Vector3d Bgi(parameters[1][6], parameters[1][7], parameters[1][8]);
+
+      Eigen::Vector3d Pj(parameters[2][0], parameters[2][1], parameters[2][2]);
+      Eigen::Quaterniond Qj(parameters[2][6], parameters[2][3], parameters[2][4], parameters[2][5]);
+
+      Eigen::Vector3d Vj(parameters[3][0], parameters[3][1], parameters[3][2]);
+      Eigen::Vector3d Baj(parameters[3][3], parameters[3][4], parameters[3][5]);
+      Eigen::Vector3d Bgj(parameters[3][6], parameters[3][7], parameters[3][8]);
+      return this->evaluate(Pi, Qi, Vi, Bai, Bgi, Pj, Qj, Vj, Baj, Bgj);
+    }
+
     double dt;
     Eigen::Vector3d acc_0, gyr_0;
     Eigen::Vector3d acc_1, gyr_1;
 
     const Eigen::Vector3d linearized_acc, linearized_gyr;
     Eigen::Vector3d linearized_ba, linearized_bg;
-
     Eigen::Matrix<double, 15, 15> jacobian, covariance;
     Eigen::Matrix<double, 15, 15> step_jacobian;
     Eigen::Matrix<double, 15, 18> step_V;
