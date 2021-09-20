@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-17 11:06:24
- * @LastEditTime: 2021-09-19 16:10:34
+ * @LastEditTime: 2021-09-20 10:18:23
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/test/sinsprocessor.cpp
@@ -24,6 +24,7 @@
 #include "preintegration.h"
 #include "sins_processor.h"
 #include "my_imu_factor.h"
+#include "format_transform.h"
 
 using namespace dh;
 using namespace std;
@@ -99,11 +100,11 @@ void test2(){
   np_to_imu(vnp, vimu);
   vimu0 = vimu;
 
-  ImuErrorParameter imuerr, imuerr1;
+  ImuErrorParameter imuerr, imuerr1, imuerr_est;
   imuerr.ba << 0, 500*C_ug, 0;  
-  // imuerr.na << 10 * C_ug_per_SqHz, 20 * C_ug_per_SqHz, 50 * C_ug_per_SqHz;
+  imuerr.na << 10 * C_ug_per_SqHz, 20 * C_ug_per_SqHz, 50 * C_ug_per_SqHz;
   imu_add_error(vimu, imuerr);
-
+  
   cout << "size np = " << vnp.size() << endl;
   cout << "size imu = " << vimu.size() << endl;
 
@@ -117,7 +118,6 @@ void test2(){
   double para_SpeedBias[terms_num][9];
   PreIntegrationTerm *preinte[terms_num];
 
-  // ceres::Problem problem;
   int window_size = 10;
   int index_np = 0, index_pre = 0;
   int counter = 0;
@@ -137,7 +137,6 @@ void test2(){
        ++it, ++counter)
   {
     if(counter == 0){
-      // vnp_sins.push_back(sins.nav_param);
       preinte[0] = new PreIntegrationTerm(it->a, it->w, ba_init, bg_init, imuerr1);
     }
     else {
@@ -146,11 +145,8 @@ void test2(){
 
     if (counter % step_length == 0 && counter != 0)
     {
-      // vnp_sins.push_back(sins.nav_param);
       preinte[++index_pre] = new PreIntegrationTerm(it->a, it->w, ba_init, bg_init, imuerr1);
     }
-
-    // sins.propagate(*it, dt);
   }
 
   counter = 0;
@@ -165,101 +161,38 @@ void test2(){
   cout << "vnp_sins size = " << vnp_sins.size() << endl;
   cout << vnp_sins << endl;
 
-  // for(int i = 0; i< sizeof(preinte); ++i)
-  //   cout << preinte[i]->sum_dt << endl;
-  
-
-  // return true;
-
-  // cout << "vnp_gps size = " << vnp_gps.size() << endl;
-  // cout << vnp_gps << endl; // no need now.
-
-  // int POSE_SIZE = vnp_sins.size() - 1;
-  // cout << POSE_SIZE << endl;
-
   // set initial parameter value.
+  std::cout << imuerr_est << endl;
   vector<LocalNavigationParameter>::const_iterator it = vnp_sins.begin();
   for(int i = 0; i < terms_num; ++i, ++it){
-    para_Pose[i][0] = it->px;
-    para_Pose[i][1] = it->py;
-    para_Pose[i][2] = it->pz;
-    para_Pose[i][3] = it->q().x();
-    para_Pose[i][4] = it->q().y();
-    para_Pose[i][5] = it->q().z();
-    para_Pose[i][6] = it->q().w();
-    para_SpeedBias[i][0] = it->vx;
-    para_SpeedBias[i][1] = it->vy;
-    para_SpeedBias[i][2] = it->vz;
-    para_SpeedBias[i][3] = ba_init(0);
-    para_SpeedBias[i][4] = ba_init(1);
-    para_SpeedBias[i][5] = ba_init(2);
-    para_SpeedBias[i][6] = bg_init(0);
-    para_SpeedBias[i][7] = bg_init(1);
-    para_SpeedBias[i][8] = bg_init(2);
-  }
-  
-  
-  MyIMUFactor* imufacetor = new MyIMUFactor(preinte[0]);
-  double pa0[7], pa1[9], pa2[7], pa3[9];
-  for(int i = 0; i < sizeof(pa0)/sizeof(pa0[1]); ++i){
-    pa0[i] = para_Pose[0][i];
-  }
-  for(int i = 0; i < sizeof(pa1)/sizeof(pa1[1]); ++i){
-    pa1[i] = para_SpeedBias[0][i];
+    set_preintegration_parameter(para_Pose[i], para_SpeedBias[i], *it, imuerr_est);
   }
 
-  for(int i = 0; i < sizeof(pa2)/sizeof(pa2[1]); ++i){
-    pa2[i] = para_Pose[1][i];
-  }
-  for(int i = 0; i < sizeof(pa3)/sizeof(pa3[1]); ++i){
-    pa3[i] = para_SpeedBias[1][i];
-  }
+  std::cout << "before optimization: " << std::endl;
+  for (int i = 0; i < 10; ++i)
+    coutArray(para_Pose[i]);
 
-  coutArray(pa0);
-  coutArray(pa1);
-  coutArray(pa2);
-  coutArray(pa3);
-  
-  // return;
-
-  double *param[4] = {pa0, pa1, pa2, pa3};
-  std::cout << "residual = " << std::endl;
-  std::cout << imufacetor->pre_integration->evaluate(param) << std::endl;;
-  // return;
-
-  double residual[15];
-  double jaco_0[15*7], jaco_1[15*9], jaco_2[15*7], jaco_3[15*9];
-  double *jacobian[4] = {jaco_0, jaco_1, jaco_2, jaco_3};
-
-  std::cout << "jaco0 = " << endl;
-  coutArray(jaco_0);
-  // coutArray(residual);
-
-  // return;
-
-  // imufacetor->Evaluate(param, residual, jacobian);
   ceres::Problem problem;
   for(int i = 0; i<10; ++i){
     MyIMUFactor* imu_factor = new MyIMUFactor(preinte[i]);
     problem.AddResidualBlock(imu_factor, NULL, para_Pose[i], para_SpeedBias[i], para_Pose[i+1], para_SpeedBias[i+1]);
   }
-  // cout << terms_num - 5 << endl;
   cout << "residual blocks num:" << problem.NumResidualBlocks() << endl;
   cout << "parameter blocks num:"  << problem.NumParameterBlocks() << endl;
 
-  // cout << para_Pose[2][1] << endl;
   ceres::Solver::Options options;
   // options.max_num_iterations = 200;
-  // options.linear_solver_type = ceres::SPARSE_NORMAL_CHOLESKY;
+  options.linear_solver_type = ceres::SPARSE_NORMAL_CHOLESKY;
 
   ceres::Solver::Summary summary;
   ceres::Solve(options, &problem, &summary);
 
-  std::cout << summary.FullReport() << '\n';
+  // std::cout << summary.FullReport() << '\n';
 
-  std::cout << para_SpeedBias[0][4] << std::endl;
-
-  // cout << summary.IsSolutionUsable();
+  std::cout << "after optimization: " << std::endl;
+  for(int i = 0; i < 10; ++i)
+    coutArray(para_Pose[i]);
+  
 }
 
 int main(){

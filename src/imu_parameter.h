@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-06 15:33:52
- * @LastEditTime: 2021-09-16 21:16:37
+ * @LastEditTime: 2021-09-20 09:02:59
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/imu.h
@@ -110,6 +110,26 @@ struct ImuMeasurement6d{
       return ImuErrorParameter();
     }
   };
+
+  inline std::ostream &operator<<(std::ostream &os, const ImuErrorParameter &err)
+  {
+    os << "sample rate = " << err.sample_rate << " (HZ)" << std::endl;
+    
+    os << "gyroscope bias = " << err.bg(0) << " " << err.bg(1) 
+    << " " << err.bg(2) << " (rad/s)" << std::endl;
+    os << "gyroscope noise = " << err.ng(0) << " " << err.ng(1) 
+    << " " << err.ng(2) << " (rad/s^0.5)" << std::endl;
+    os << "gyroscope bias random walk = " << err.rwg(0) << " " << err.rwg(1) 
+    << " " << err.rwg(2) << " (rad/s^1.5)" << std::endl;
+
+    os << "accelerometer bias = " << err.ba(0) << " " << err.ba(1) 
+    << " " << err.ba(2) << " (m/s^2)" << std::endl;
+    os << "accelerometer noise = " << err.na(0) << " " << err.na(1) 
+    << " " << err.na(2) << " (m/s^1.5)" << std::endl;
+    os << "accelerometer bias random walk = " << err.rwa(0) << " " << err.rwa(1) 
+    << " " << err.rwa(2) << " (m/s^2.5)";
+    return os;
+  }
 
   void imu_add_error(std::vector<ImuMeasurement6d> &imu,
                      const ImuErrorParameter &err);

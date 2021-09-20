@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-04 15:04:02
- * @LastEditTime: 2021-09-19 15:11:03
+ * @LastEditTime: 2021-09-20 09:53:07
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/io.h
@@ -54,10 +54,9 @@ namespace dh{
   }
 
   template<typename T>
-  void coutArray(const T& arr){
-    for(int i = 0; i < sizeof(arr)/ sizeof(arr[0]); ++i){
-      std::cout << arr[i] << " ";
-    }
+  void coutArray(const T& array){
+    for(int i = 0; i < sizeof(array)/ sizeof(array[0]); ++i)
+      std::cout << array[i] << " ";
     std::cout << std::endl;
   }
 } // namespace dh

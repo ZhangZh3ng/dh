@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-16 21:11:41
- * @LastEditTime: 2021-09-16 21:21:52
+ * @LastEditTime: 2021-09-19 16:15:03
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /dh/src/boost_ceres.h
@@ -12,6 +12,7 @@
 
 #include "ceres_example_slam/pose_graph_3d/types.h"
 
+using namespace ceres::examples;
 
 namespace dh{
 
